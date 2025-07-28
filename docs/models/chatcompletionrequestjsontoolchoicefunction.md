@@ -1,0 +1,9 @@
+# ChatCompletionRequestJSONToolChoiceFunction
+
+
+## Fields
+
+| Field                                                                                                  | Type                                                                                                   | Required                                                                                               | Description                                                                                            |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `type`                                                                                                 | [models.ChatCompletionRequestJSONToolChoiceType](../models/chatcompletionrequestjsontoolchoicetype.md) | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `function`                                                                                             | [models.ChatCompletionRequestJSONFunction](../models/chatcompletionrequestjsonfunction.md)             | :heavy_check_mark:                                                                                     | N/A                                                                                                    |

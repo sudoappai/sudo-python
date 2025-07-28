@@ -1,0 +1,9 @@
+# ChatCompletionRequestStreamResponseFormatJSONSchema
+
+
+## Fields
+
+| Field                                                                                                      | Type                                                                                                       | Required                                                                                                   | Description                                                                                                |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `type`                                                                                                     | [models.ChatCompletionRequestStreamTypeJSONSchema](../models/chatcompletionrequeststreamtypejsonschema.md) | :heavy_check_mark:                                                                                         | N/A                                                                                                        |
+| `json_schema`                                                                                              | [models.ChatCompletionRequestStreamJSONSchema](../models/chatcompletionrequeststreamjsonschema.md)         | :heavy_check_mark:                                                                                         | The JSON schema definition for structured outputs.                                                         |

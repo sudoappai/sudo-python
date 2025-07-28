@@ -1,0 +1,11 @@
+# ChatCompletionRequestStreamPrediction
+
+Configuration for a Predicted Output, which can greatly improve response times when large parts of the model response are known ahead of time. This is most common when you are regenerating a file with only minor changes to most of the content.
+
+
+## Fields
+
+| Field                                                                                                          | Type                                                                                                           | Required                                                                                                       | Description                                                                                                    |
+| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `type`                                                                                                         | [Optional[models.ChatCompletionRequestStreamTypeContent]](../models/chatcompletionrequeststreamtypecontent.md) | :heavy_minus_sign:                                                                                             | N/A                                                                                                            |
+| `content`                                                                                                      | *Optional[str]*                                                                                                | :heavy_minus_sign:                                                                                             | The predicted content for the completion.                                                                      |
