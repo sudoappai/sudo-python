@@ -65,7 +65,7 @@ class SudoTestConfig:
         if not self.client:
             self.client = Sudo(
                 server_url=self.base_url,
-                api_key=""
+                api_key=self.api_key
             )
         return self.client
 
