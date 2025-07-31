@@ -131,7 +131,9 @@ cython_debug/
 .vscode/
 
 # Speakeasy
-.speakeasy/
+**/.speakeasy/temp/
+**/.speakeasy/logs/
+/.speakeasy/reports
 
 # macOS
 .DS_Store
