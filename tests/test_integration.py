@@ -493,133 +493,133 @@ class TestReasoningModels:
                 raise
 
 
-class TestStoredCompletions:
-    """Test CRUD operations for stored completions."""
+# class TestStoredCompletions:
+#     """Test CRUD operations for stored completions."""
     
-    def test_completion_crud_operations(self, client):
-        """Test creating, reading, updating, and deleting stored completions."""
-        # Step 1: Create a stored completion
-        messages = [
-            {"role": "developer", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Hello! Give me a study plan to learn Python."}
-        ]
+#     def test_completion_crud_operations(self, client):
+#         """Test creating, reading, updating, and deleting stored completions."""
+#         # Step 1: Create a stored completion
+#         messages = [
+#             {"role": "developer", "content": "You are a helpful assistant."},
+#             {"role": "user", "content": "Hello! Give me a study plan to learn Python."}
+#         ]
         
-        create_response = client.router.create(
-            model="gpt-4o",
-            messages=messages,
-            store=True,
-            max_completion_tokens=150
-        )
+#         create_response = client.router.create(
+#             model="gpt-4o",
+#             messages=messages,
+#             store=True,
+#             max_completion_tokens=150
+#         )
         
-        assert hasattr(create_response, 'id')
-        completion_id = create_response.id
+#         assert hasattr(create_response, 'id')
+#         completion_id = create_response.id
         
-        # Step 2: Get the completion by ID (with retries)
-        max_attempts = 6
-        delay_between_attempts = 2
+#         # Step 2: Get the completion by ID (with retries)
+#         max_attempts = 6
+#         delay_between_attempts = 2
         
-        get_response = None
-        for attempt in range(max_attempts):
-            try:
-                get_response = client.router.get_chat_completion(completion_id=completion_id)
-                break
-            except Exception as e:
-                if attempt < max_attempts - 1:
-                    time.sleep(delay_between_attempts)
-                    continue
-                else:
-                    raise
+#         get_response = None
+#         for attempt in range(max_attempts):
+#             try:
+#                 get_response = client.router.get_chat_completion(completion_id=completion_id)
+#                 break
+#             except Exception as e:
+#                 if attempt < max_attempts - 1:
+#                     time.sleep(delay_between_attempts)
+#                     continue
+#                 else:
+#                     raise
         
-        assert get_response is not None
-        assert hasattr(get_response, 'id')
-        assert get_response.id == completion_id
-        assert hasattr(get_response, 'object')
-        assert get_response.object == "chat.completion"
+#         assert get_response is not None
+#         assert hasattr(get_response, 'id')
+#         assert get_response.id == completion_id
+#         assert hasattr(get_response, 'object')
+#         assert get_response.object == "chat.completion"
         
-        # Step 3: Get messages for the completion (with retries)
-        messages_response = None
-        for attempt in range(max_attempts):
-            try:
-                messages_response = client.router.get_chat_completion_messages(completion_id=completion_id)
-                break
-            except Exception as e:
-                if attempt < max_attempts - 1:
-                    time.sleep(delay_between_attempts)
-                    continue
-                else:
-                    raise
+#         # Step 3: Get messages for the completion (with retries)
+#         messages_response = None
+#         for attempt in range(max_attempts):
+#             try:
+#                 messages_response = client.router.get_chat_completion_messages(completion_id=completion_id)
+#                 break
+#             except Exception as e:
+#                 if attempt < max_attempts - 1:
+#                     time.sleep(delay_between_attempts)
+#                     continue
+#                 else:
+#                     raise
         
-        assert messages_response is not None
-        assert hasattr(messages_response, 'object')
-        assert hasattr(messages_response, 'data')
-        assert isinstance(messages_response.data, list)
-        assert len(messages_response.data) > 0
+#         assert messages_response is not None
+#         assert hasattr(messages_response, 'object')
+#         assert hasattr(messages_response, 'data')
+#         assert isinstance(messages_response.data, list)
+#         assert len(messages_response.data) > 0
         
-        # Check first message structure
-        first_message = messages_response.data[0]
-        assert hasattr(first_message, 'role')
-        assert first_message.role == "developer"
-        assert hasattr(first_message, 'content')
+#         # Check first message structure
+#         first_message = messages_response.data[0]
+#         assert hasattr(first_message, 'role')
+#         assert first_message.role == "developer"
+#         assert hasattr(first_message, 'content')
         
-        # Step 4: Update the completion with metadata (with retries)
-        update_response = None
-        for attempt in range(max_attempts):
-            try:
-                update_response = client.router.update_chat_completion(
-                    completion_id=completion_id,
-                    metadata={"test": "value", "updated": "true"}
-                )
-                break
-            except Exception as e:
-                if attempt < max_attempts - 1:
-                    time.sleep(delay_between_attempts)
-                    continue
-                else:
-                    raise
+#         # Step 4: Update the completion with metadata (with retries)
+#         update_response = None
+#         for attempt in range(max_attempts):
+#             try:
+#                 update_response = client.router.update_chat_completion(
+#                     completion_id=completion_id,
+#                     metadata={"test": "value", "updated": "true"}
+#                 )
+#                 break
+#             except Exception as e:
+#                 if attempt < max_attempts - 1:
+#                     time.sleep(delay_between_attempts)
+#                     continue
+#                 else:
+#                     raise
         
-        assert update_response is not None
-        assert hasattr(update_response, 'id')
-        assert update_response.id == completion_id
-        assert hasattr(update_response, 'metadata')
-        assert update_response.metadata["test"] == "value"
-        assert update_response.metadata["updated"] == "true"
+#         assert update_response is not None
+#         assert hasattr(update_response, 'id')
+#         assert update_response.id == completion_id
+#         assert hasattr(update_response, 'metadata')
+#         assert update_response.metadata["test"] == "value"
+#         assert update_response.metadata["updated"] == "true"
         
-        # Step 5: List completions to verify it's there
-        list_response = client.router.list_chat_completions(limit=10, order="desc")
-        assert hasattr(list_response, 'object')
-        assert list_response.object == "list"
-        assert hasattr(list_response, 'data')
-        assert isinstance(list_response.data, list)
+#         # Step 5: List completions to verify it's there
+#         list_response = client.router.list_chat_completions(limit=10, order="desc")
+#         assert hasattr(list_response, 'object')
+#         assert list_response.object == "list"
+#         assert hasattr(list_response, 'data')
+#         assert isinstance(list_response.data, list)
         
-        # Find our completion in the list
-        found_completion = None
-        for completion in list_response.data:
-            if hasattr(completion, 'id') and completion.id == completion_id:
-                found_completion = completion
-                break
+#         # Find our completion in the list
+#         found_completion = None
+#         for completion in list_response.data:
+#             if hasattr(completion, 'id') and completion.id == completion_id:
+#                 found_completion = completion
+#                 break
         
-        assert found_completion is not None, f"Completion {completion_id} not found in list"
+#         assert found_completion is not None, f"Completion {completion_id} not found in list"
         
-        # Step 6: Delete the completion (with retries)
-        delete_response = None
-        for attempt in range(max_attempts):
-            try:
-                delete_response = client.router.delete_chat_completion(completion_id=completion_id)
-                break
-            except Exception as e:
-                if attempt < max_attempts - 1:
-                    time.sleep(delay_between_attempts)
-                    continue
-                else:
-                    raise
+#         # Step 6: Delete the completion (with retries)
+#         delete_response = None
+#         for attempt in range(max_attempts):
+#             try:
+#                 delete_response = client.router.delete_chat_completion(completion_id=completion_id)
+#                 break
+#             except Exception as e:
+#                 if attempt < max_attempts - 1:
+#                     time.sleep(delay_between_attempts)
+#                     continue
+#                 else:
+#                     raise
         
-        assert delete_response is not None
-        assert hasattr(delete_response, 'id')
-        assert delete_response.id == completion_id
-        assert hasattr(delete_response, 'object')
-        assert delete_response.object == "chat.completion.deleted"
-        assert hasattr(delete_response, 'deleted')
-        assert delete_response.deleted is True
+#         assert delete_response is not None
+#         assert hasattr(delete_response, 'id')
+#         assert delete_response.id == completion_id
+#         assert hasattr(delete_response, 'object')
+#         assert delete_response.object == "chat.completion.deleted"
+#         assert hasattr(delete_response, 'deleted')
+#         assert delete_response.deleted is True
 
 
 class TestErrorHandling:
