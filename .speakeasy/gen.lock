@@ -1,0 +1,321 @@
+lockVersion: 2.0.0
+id: f41d5249-2e28-4aee-bf6c-d4543ad21441
+management:
+  docChecksum: 3dfed336234b2667d6893ec7f7cd31ee
+  docVersion: 0.1.0
+  speakeasyVersion: 1.606.3
+  generationVersion: 2.687.1
+  releaseVersion: 0.0.1
+  configChecksum: eabf5f9e94dd7ab40bedeca47c99cc77
+features:
+  python:
+    additionalDependencies: 1.0.0
+    constsAndDefaults: 1.0.5
+    core: 5.19.9
+    defaultEnabledRetries: 0.2.0
+    devContainers: 3.0.0
+    enumUnions: 0.1.0
+    envVarSecurityUsage: 0.3.2
+    flatRequests: 1.0.1
+    flattening: 3.1.1
+    globalSecurity: 3.0.3
+    globalSecurityCallbacks: 1.0.0
+    globalSecurityFlattening: 1.0.0
+    globalServerURLs: 3.1.1
+    methodArguments: 1.0.2
+    nullables: 1.0.1
+    responseFormat: 1.0.1
+    retries: 3.0.2
+    sdkHooks: 1.1.0
+    serverEvents: 1.0.7
+    serverEventsSentinels: 0.1.0
+    unions: 3.0.4
+generatedFiles:
+  - .devcontainer/README.md
+  - .devcontainer/devcontainer.json
+  - .devcontainer/setup.sh
+  - .gitattributes
+  - .vscode/settings.json
+  - USAGE.md
+  - docs/errors/errorresponse.md
+  - docs/models/chatcompletion.md
+  - docs/models/chatcompletionchunk.md
+  - docs/models/chatcompletionchunkchoice.md
+  - docs/models/chatcompletiondelta.md
+  - docs/models/chatcompletionlist.md
+  - docs/models/chatcompletionrequestjson.md
+  - docs/models/chatcompletionrequestjsonaudio.md
+  - docs/models/chatcompletionrequestjsonformat.md
+  - docs/models/chatcompletionrequestjsonfunction.md
+  - docs/models/chatcompletionrequestjsonjsonschema.md
+  - docs/models/chatcompletionrequestjsonmodality.md
+  - docs/models/chatcompletionrequestjsonprediction.md
+  - docs/models/chatcompletionrequestjsonreasoningeffort.md
+  - docs/models/chatcompletionrequestjsonresponseformatjsonobject.md
+  - docs/models/chatcompletionrequestjsonresponseformatjsonschema.md
+  - docs/models/chatcompletionrequestjsonresponseformattext.md
+  - docs/models/chatcompletionrequestjsonresponseformatunion.md
+  - docs/models/chatcompletionrequestjsonservicetier.md
+  - docs/models/chatcompletionrequestjsonstreamoptions.md
+  - docs/models/chatcompletionrequestjsontoolchoiceenum.md
+  - docs/models/chatcompletionrequestjsontoolchoicefunction.md
+  - docs/models/chatcompletionrequestjsontoolchoicetype.md
+  - docs/models/chatcompletionrequestjsontoolchoiceunion.md
+  - docs/models/chatcompletionrequestjsontypecontent.md
+  - docs/models/chatcompletionrequestjsontypejsonobject.md
+  - docs/models/chatcompletionrequestjsontypejsonschema.md
+  - docs/models/chatcompletionrequestjsontypetext.md
+  - docs/models/chatcompletionrequestjsonvoice.md
+  - docs/models/chatcompletionrequeststream.md
+  - docs/models/chatcompletionrequeststreamaudio.md
+  - docs/models/chatcompletionrequeststreamformat.md
+  - docs/models/chatcompletionrequeststreamfunction.md
+  - docs/models/chatcompletionrequeststreamjsonschema.md
+  - docs/models/chatcompletionrequeststreammodality.md
+  - docs/models/chatcompletionrequeststreamprediction.md
+  - docs/models/chatcompletionrequeststreamreasoningeffort.md
+  - docs/models/chatcompletionrequeststreamresponseformatjsonobject.md
+  - docs/models/chatcompletionrequeststreamresponseformatjsonschema.md
+  - docs/models/chatcompletionrequeststreamresponseformattext.md
+  - docs/models/chatcompletionrequeststreamresponseformatunion.md
+  - docs/models/chatcompletionrequeststreamservicetier.md
+  - docs/models/chatcompletionrequeststreamstreamoptions.md
+  - docs/models/chatcompletionrequeststreamtoolchoiceenum.md
+  - docs/models/chatcompletionrequeststreamtoolchoicefunction.md
+  - docs/models/chatcompletionrequeststreamtoolchoicetype.md
+  - docs/models/chatcompletionrequeststreamtoolchoiceunion.md
+  - docs/models/chatcompletionrequeststreamtypecontent.md
+  - docs/models/chatcompletionrequeststreamtypejsonobject.md
+  - docs/models/chatcompletionrequeststreamtypejsonschema.md
+  - docs/models/chatcompletionrequeststreamtypetext.md
+  - docs/models/chatcompletionrequeststreamvoice.md
+  - docs/models/chatdeletionconfirmation.md
+  - docs/models/chatmessage.md
+  - docs/models/chatmessagelist.md
+  - docs/models/choice.md
+  - docs/models/contentpart1.md
+  - docs/models/contentpart2.md
+  - docs/models/contentpart3.md
+  - docs/models/contentpart4.md
+  - docs/models/contentpartunion.md
+  - docs/models/data.md
+  - docs/models/deletechatcompletionrequest.md
+  - docs/models/errordetail.md
+  - docs/models/file.md
+  - docs/models/finishreason.md
+  - docs/models/function.md
+  - docs/models/getchatcompletionmessagesrequest.md
+  - docs/models/getchatcompletionrequest.md
+  - docs/models/imagedata.md
+  - docs/models/imagegeneration.md
+  - docs/models/imagegenerationrequest.md
+  - docs/models/imageinputtokens.md
+  - docs/models/imageurl.md
+  - docs/models/imageusage.md
+  - docs/models/inputaudio.md
+  - docs/models/listchatcompletionsrequest.md
+  - docs/models/logprobs.md
+  - docs/models/messagecontent.md
+  - docs/models/messageresponse.md
+  - docs/models/object.md
+  - docs/models/quality.md
+  - docs/models/responseformatenum.md
+  - docs/models/returnedchatmessages.md
+  - docs/models/role.md
+  - docs/models/security.md
+  - docs/models/size.md
+  - docs/models/style.md
+  - docs/models/supportedmodel.md
+  - docs/models/supportedmodelslist.md
+  - docs/models/tool.md
+  - docs/models/toolcall.md
+  - docs/models/toolcallfunction.md
+  - docs/models/updatechatcompletionrequest.md
+  - docs/models/updatechatcompletionrequestbody.md
+  - docs/models/usage.md
+  - docs/models/utils/retryconfig.md
+  - docs/sdks/router/README.md
+  - docs/sdks/sudo/README.md
+  - docs/sdks/system/README.md
+  - py.typed
+  - pylintrc
+  - pyproject.toml
+  - scripts/publish.sh
+  - src/sudo_ai/__init__.py
+  - src/sudo_ai/_hooks/__init__.py
+  - src/sudo_ai/_hooks/sdkhooks.py
+  - src/sudo_ai/_hooks/types.py
+  - src/sudo_ai/_version.py
+  - src/sudo_ai/basesdk.py
+  - src/sudo_ai/errors/__init__.py
+  - src/sudo_ai/errors/errorresponse.py
+  - src/sudo_ai/errors/no_response_error.py
+  - src/sudo_ai/errors/responsevalidationerror.py
+  - src/sudo_ai/errors/sudodefaulterror.py
+  - src/sudo_ai/errors/sudoerror.py
+  - src/sudo_ai/httpclient.py
+  - src/sudo_ai/models/__init__.py
+  - src/sudo_ai/models/chatcompletion.py
+  - src/sudo_ai/models/chatcompletionchunk.py
+  - src/sudo_ai/models/chatcompletionchunkchoice.py
+  - src/sudo_ai/models/chatcompletiondelta.py
+  - src/sudo_ai/models/chatcompletionlist.py
+  - src/sudo_ai/models/chatcompletionrequestjson.py
+  - src/sudo_ai/models/chatcompletionrequeststream.py
+  - src/sudo_ai/models/chatdeletionconfirmation.py
+  - src/sudo_ai/models/chatmessage.py
+  - src/sudo_ai/models/chatmessagelist.py
+  - src/sudo_ai/models/choice.py
+  - src/sudo_ai/models/contentpart_union.py
+  - src/sudo_ai/models/deletechatcompletionop.py
+  - src/sudo_ai/models/errordetail.py
+  - src/sudo_ai/models/function.py
+  - src/sudo_ai/models/getchatcompletionmessagesop.py
+  - src/sudo_ai/models/getchatcompletionop.py
+  - src/sudo_ai/models/imagedata.py
+  - src/sudo_ai/models/imagegeneration.py
+  - src/sudo_ai/models/imagegenerationrequest.py
+  - src/sudo_ai/models/imageinputtokens.py
+  - src/sudo_ai/models/imageusage.py
+  - src/sudo_ai/models/listchatcompletionsop.py
+  - src/sudo_ai/models/messagecontent.py
+  - src/sudo_ai/models/messageresponse.py
+  - src/sudo_ai/models/returnedchatmessages.py
+  - src/sudo_ai/models/security.py
+  - src/sudo_ai/models/supportedmodel.py
+  - src/sudo_ai/models/supportedmodelslist.py
+  - src/sudo_ai/models/tool.py
+  - src/sudo_ai/models/toolcall.py
+  - src/sudo_ai/models/toolcallfunction.py
+  - src/sudo_ai/models/updatechatcompletionop.py
+  - src/sudo_ai/models/usage.py
+  - src/sudo_ai/py.typed
+  - src/sudo_ai/router.py
+  - src/sudo_ai/sdk.py
+  - src/sudo_ai/sdkconfiguration.py
+  - src/sudo_ai/system.py
+  - src/sudo_ai/types/__init__.py
+  - src/sudo_ai/types/basemodel.py
+  - src/sudo_ai/utils/__init__.py
+  - src/sudo_ai/utils/annotations.py
+  - src/sudo_ai/utils/datetimes.py
+  - src/sudo_ai/utils/enums.py
+  - src/sudo_ai/utils/eventstreaming.py
+  - src/sudo_ai/utils/forms.py
+  - src/sudo_ai/utils/headers.py
+  - src/sudo_ai/utils/logger.py
+  - src/sudo_ai/utils/metadata.py
+  - src/sudo_ai/utils/queryparams.py
+  - src/sudo_ai/utils/requestbodies.py
+  - src/sudo_ai/utils/retries.py
+  - src/sudo_ai/utils/security.py
+  - src/sudo_ai/utils/serializers.py
+  - src/sudo_ai/utils/unmarshal_json_response.py
+  - src/sudo_ai/utils/url.py
+  - src/sudo_ai/utils/values.py
+examples:
+  healthCheck:
+    speakeasy-default-health-check:
+      responses:
+        "200":
+          application/json: "<value>"
+  getSupportedModels:
+    speakeasy-default-get-supported-models:
+      responses:
+        "200":
+          application/json: {"data": [], "first_id": "<id>", "has_more": false, "last_id": "<id>"}
+        "401":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  listChatCompletions:
+    speakeasy-default-list-chat-completions:
+      responses:
+        "200":
+          application/json: {"data": [{"choices": [{"finish_reason": "<value>", "index": 592199, "message": {"role": "<value>"}}], "created": 590687, "id": "<id>", "model": "Fiesta", "object": "<value>", "usage": {"completion_tokens": 301698, "prompt_tokens": 970006, "total_tokens": 767963}}], "first_id": "<id>", "has_more": true, "last_id": "<id>", "object": "<value>"}
+        "401":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  create:
+    speakeasy-default-create:
+      requestBody:
+        application/json: {"messages": [], "model": "Camry", "stream": false}
+      responses:
+        "200":
+          application/json: {"choices": [], "created": 927041, "id": "<id>", "model": "Prius", "object": "<value>", "usage": {"completion_tokens": 511854, "prompt_tokens": 537178, "total_tokens": 354609}}
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  createStreaming:
+    speakeasy-default-create-streaming:
+      requestBody:
+        application/json: {"messages": [{"content": "<value>", "role": "<value>"}], "model": "PT Cruiser", "stream": true}
+      responses:
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  getChatCompletion:
+    speakeasy-default-get-chat-completion:
+      parameters:
+        path:
+          completion_id: "<id>"
+      responses:
+        "200":
+          application/json: {"choices": [], "created": 491714, "id": "<id>", "model": "Altima", "object": "<value>", "usage": {"completion_tokens": 672472, "prompt_tokens": 378188, "total_tokens": 386968}}
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  updateChatCompletion:
+    speakeasy-default-update-chat-completion:
+      parameters:
+        path:
+          completion_id: "<id>"
+      requestBody:
+        application/json: {"metadata": {}}
+      responses:
+        "200":
+          application/json: {"choices": [{"finish_reason": "<value>", "index": 521048, "message": {"role": "<value>"}}], "created": 998544, "id": "<id>", "model": "PT Cruiser", "object": "<value>", "usage": {"completion_tokens": 997875, "prompt_tokens": 124510, "total_tokens": 648236}}
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  deleteChatCompletion:
+    speakeasy-default-delete-chat-completion:
+      parameters:
+        path:
+          completion_id: "<id>"
+      responses:
+        "200":
+          application/json: {"deleted": false, "id": "<id>", "object": "<value>"}
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  getChatCompletionMessages:
+    speakeasy-default-get-chat-completion-messages:
+      parameters:
+        path:
+          completion_id: "<id>"
+      responses:
+        "200":
+          application/json: {"data": [], "first_id": "<id>", "has_more": false, "last_id": "<id>", "object": "<value>"}
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  generateImage:
+    speakeasy-default-generate-image:
+      requestBody:
+        application/json: {"prompt": "<value>", "model": "PT Cruiser"}
+      responses:
+        "200":
+          application/json: {"data": []}
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+examplesVersion: 1.0.2

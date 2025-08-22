@@ -23,42 +23,29 @@ Developer-friendly & type-safe Python SDK specifically catered to leverage *sudo
 <!-- Start Table of Contents [toc] -->
 ## Table of Contents
 <!-- $toc-max-depth=2 -->
-- [sudo](#sudo)
-  - [Summary](#summary)
-  - [Table of Contents](#table-of-contents)
-  - [SDK Installation](#sdk-installation)
-    - [PIP](#pip)
-    - [Poetry](#poetry)
-    - [Shell and script usage with `uv`](#shell-and-script-usage-with-uv)
-  - [IDE Support](#ide-support)
-    - [PyCharm](#pycharm)
-  - [SDK Example Usage](#sdk-example-usage)
-    - [Example](#example)
-  - [Authentication](#authentication)
-    - [Per-Client Security Schemes](#per-client-security-schemes)
-  - [Available Resources and Operations](#available-resources-and-operations)
-    - [router](#router)
-    - [system](#system)
-  - [Server-sent event streaming](#server-sent-event-streaming)
-  - [Retries](#retries)
-  - [Error Handling](#error-handling)
-    - [Example](#example-1)
-    - [Error Classes](#error-classes)
-  - [Custom HTTP Client](#custom-http-client)
-  - [Resource Management](#resource-management)
-  - [Debugging](#debugging)
-- [Development](#development)
-  - [Maturity](#maturity)
-  - [Contributions](#contributions)
-    - [SDK Created by Speakeasy](#sdk-created-by-speakeasy)
+* [sudo](#sudo)
+  * [SDK Installation](#sdk-installation)
+  * [IDE Support](#ide-support)
+  * [SDK Example Usage](#sdk-example-usage)
+  * [Authentication](#authentication)
+  * [Available Resources and Operations](#available-resources-and-operations)
+  * [Server-sent event streaming](#server-sent-event-streaming)
+  * [Retries](#retries)
+  * [Error Handling](#error-handling)
+  * [Custom HTTP Client](#custom-http-client)
+  * [Resource Management](#resource-management)
+  * [Debugging](#debugging)
+* [Development](#development)
+  * [Maturity](#maturity)
+  * [Contributions](#contributions)
 
 <!-- End Table of Contents [toc] -->
 
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
 
-<!-- > [!TIP]
-> To finish publishing your SDK to PyPI you must [run your first generation action](https://www.speakeasy.com/docs/github-setup#step-by-step-guide). -->
+> [!TIP]
+> To finish publishing your SDK to PyPI you must [run your first generation action](https://www.speakeasy.com/docs/github-setup#step-by-step-guide).
 
 
 > [!NOTE]
@@ -66,14 +53,22 @@ Developer-friendly & type-safe Python SDK specifically catered to leverage *sudo
 >
 > Once a Python version reaches its [official end of life date](https://devguide.python.org/versions/), a 3-month grace period is provided for users to upgrade. Following this grace period, the minimum python version supported in the SDK will be updated.
 
-The SDK can be installed with either *pip* or *poetry* package managers.
+The SDK can be installed with *uv*, *pip*, or *poetry* package managers.
+
+### uv
+
+*uv* is a fast Python package installer and resolver, designed as a drop-in replacement for pip and pip-tools. It's recommended for its speed and modern Python tooling capabilities.
+
+```bash
+uv add git+<UNSET>.git
+```
 
 ### PIP
 
 *PIP* is the default package installer for Python, enabling easy installation and management of packages from PyPI via the command line.
 
 ```bash
-pip install sudo-python
+pip install git+<UNSET>.git
 ```
 
 ### Poetry
@@ -81,7 +76,7 @@ pip install sudo-python
 *Poetry* is a modern tool that simplifies dependency management and package publishing by using a single `pyproject.toml` file to handle project metadata and dependencies.
 
 ```bash
-poetry add sudo-python
+poetry add git+<UNSET>.git
 ```
 
 ### Shell and script usage with `uv`
@@ -89,7 +84,7 @@ poetry add sudo-python
 You can use this SDK in a Python shell with [uv](https://docs.astral.sh/uv/) and the `uvx` command that comes with it like so:
 
 ```shell
-uvx --from sudo python
+uvx --from sudo-ai python
 ```
 
 It's also possible to write a standalone Python script without needing to set up a whole project like so:
@@ -99,11 +94,11 @@ It's also possible to write a standalone Python script without needing to set up
 # /// script
 # requires-python = ">=3.9"
 # dependencies = [
-#     "sudo",
+#     "sudo-ai",
 # ]
 # ///
 
-from sudo import Sudo
+from sudo_ai import Sudo
 
 sdk = Sudo(
   # SDK arguments
@@ -134,15 +129,15 @@ Generally, the SDK will work well with most IDEs out of the box. However, when u
 ```python
 # Synchronous Example
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.system.health_check()
+    res = sudo.system.health_check()
 
     # Handle response
     print(res)
@@ -150,21 +145,21 @@ with Sudo(
 
 </br>
 
-The same SDK client can also be used to make asychronous requests by importing asyncio.
+The same SDK client can also be used to make asynchronous requests by importing asyncio.
 ```python
 # Asynchronous Example
 import asyncio
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 async def main():
 
     async with Sudo(
         server_url="https://api.example.com",
         api_key=os.getenv("SUDO_API_KEY", ""),
-    ) as s_client:
+    ) as sudo:
 
-        res = await s_client.system.health_check_async()
+        res = await sudo.system.health_check_async()
 
         # Handle response
         print(res)
@@ -187,15 +182,15 @@ This SDK supports the following security scheme globally:
 To authenticate with the API the `api_key` parameter must be set when initializing the SDK client instance. For example:
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.system.health_check()
+    res = sudo.system.health_check()
 
     # Handle response
     print(res)
@@ -218,6 +213,7 @@ with Sudo(
 * [update_chat_completion](docs/sdks/router/README.md#update_chat_completion) - *[OpenAI Only]* Update a Chat Completion with some metadata. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.
 * [delete_chat_completion](docs/sdks/router/README.md#delete_chat_completion) - *[OpenAI Only]* Delete a stored Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.
 * [get_chat_completion_messages](docs/sdks/router/README.md#get_chat_completion_messages) - *[OpenAI Only]* Get the array of messages for a saved Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.
+* [generate_image](docs/sdks/router/README.md#generate_image) - Generate Image
 
 
 ### [system](docs/sdks/system/README.md)
@@ -242,32 +238,25 @@ underlying connection when the context is exited.
 
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.router.create_streaming(messages=[
+    res = sudo.router.create_streaming(messages=[
         {
-            "content": "You are a helpful assistant.",
-            "role": "developer",
+            "content": "<value>",
+            "role": "<value>",
         },
-        {
-            "content": "Hello! How are you?",
-            "role": "user",
-        },
-    ], model="gpt-4o")
+    ], model="PT Cruiser", stream=True)
 
     with res as event_stream:
-        for chunk in event_stream:
-            # Access the chunk data
-            if chunk.data and chunk.data.choices:
-                for choice in chunk.data.choices:
-                    if choice.delta and choice.delta.content:
-                        print(choice.delta.content, end="", flush=True)
+        for event in event_stream:
+            # handle event
+            print(event, flush=True)
 
 ```
 
@@ -284,16 +273,16 @@ Some of the endpoints in this SDK support retries. If you use the SDK without an
 To change the default retry strategy for a single API call, simply provide a `RetryConfig` object to the call:
 ```python
 import os
-from sudo import Sudo
-from sudo.utils import BackoffStrategy, RetryConfig
+from sudo_ai import Sudo
+from sudo_ai.utils import BackoffStrategy, RetryConfig
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.system.health_check(,
+    res = sudo.system.health_check(,
         RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False))
 
     # Handle response
@@ -304,17 +293,17 @@ with Sudo(
 If you'd like to override the default retry strategy for all operations that support retries, you can use the `retry_config` optional parameter when initializing the SDK:
 ```python
 import os
-from sudo import Sudo
-from sudo.utils import BackoffStrategy, RetryConfig
+from sudo_ai import Sudo
+from sudo_ai.utils import BackoffStrategy, RetryConfig
 
 
 with Sudo(
     server_url="https://api.example.com",
     retry_config=RetryConfig("backoff", BackoffStrategy(1, 50, 1.1, 100), False),
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.system.health_check()
+    res = sudo.system.health_check()
 
     # Handle response
     print(res)
@@ -325,7 +314,7 @@ with Sudo(
 <!-- Start Error Handling [errors] -->
 ## Error Handling
 
-[`SudoError`](./src/sudo/errors/sudoerror.py) is the base class for all HTTP error responses. It has the following properties:
+[`SudoError`](./src/sudo_ai/errors/sudoerror.py) is the base class for all HTTP error responses. It has the following properties:
 
 | Property           | Type             | Description                                                                             |
 | ------------------ | ---------------- | --------------------------------------------------------------------------------------- |
@@ -339,17 +328,17 @@ with Sudo(
 ### Example
 ```python
 import os
-from sudo import Sudo, errors
+from sudo_ai import Sudo, errors
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
     res = None
     try:
 
-        res = s_client.system.get_supported_models()
+        res = sudo.system.get_supported_models()
 
         # Handle response
         print(res)
@@ -370,8 +359,8 @@ with Sudo(
 
 ### Error Classes
 **Primary errors:**
-* [`SudoError`](./src/sudo/errors/sudoerror.py): The base class for HTTP error responses.
-  * [`ErrorResponse`](./src/sudo/errors/errorresponse.py): *
+* [`SudoError`](./src/sudo_ai/errors/sudoerror.py): The base class for HTTP error responses.
+  * [`ErrorResponse`](./src/sudo_ai/errors/errorresponse.py): *
 
 <details><summary>Less common errors (5)</summary>
 
@@ -383,8 +372,8 @@ with Sudo(
     * [`httpx.TimeoutException`](https://www.python-httpx.org/exceptions/#httpx.TimeoutException): HTTP request timed out.
 
 
-**Inherit from [`SudoError`](./src/sudo/errors/sudoerror.py)**:
-* [`ResponseValidationError`](./src/sudo/errors/responsevalidationerror.py): Type mismatch between the response data and the expected Pydantic model. Provides access to the Pydantic validation error via the `cause` attribute.
+**Inherit from [`SudoError`](./src/sudo_ai/errors/sudoerror.py)**:
+* [`ResponseValidationError`](./src/sudo_ai/errors/responsevalidationerror.py): Type mismatch between the response data and the expected Pydantic model. Provides access to the Pydantic validation error via the `cause` attribute.
 
 </details>
 
@@ -400,7 +389,7 @@ This allows you to wrap the client with your own custom logic, such as adding cu
 
 For example, you could specify a header for every request that this sdk makes as follows:
 ```python
-from sudo import Sudo
+from sudo_ai import Sudo
 import httpx
 
 http_client = httpx.Client(headers={"x-custom-header": "someValue"})
@@ -409,8 +398,8 @@ s = Sudo(client=http_client)
 
 or you could wrap the client with your own custom logic:
 ```python
-from sudo import Sudo
-from sudo.httpclient import AsyncHttpClient
+from sudo_ai import Sudo
+from sudo_ai.httpclient import AsyncHttpClient
 import httpx
 
 class CustomClient(AsyncHttpClient):
@@ -481,13 +470,13 @@ The `Sudo` class implements the context manager protocol and registers a finaliz
 
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 def main():
 
     with Sudo(
         server_url="https://api.example.com",
         api_key=os.getenv("SUDO_API_KEY", ""),
-    ) as s_client:
+    ) as sudo:
         # Rest of application here...
 
 
@@ -497,7 +486,7 @@ async def amain():
     async with Sudo(
         server_url="https://api.example.com",
         api_key=os.getenv("SUDO_API_KEY", ""),
-    ) as s_client:
+    ) as sudo:
         # Rest of application here...
 ```
 <!-- End Resource Management [resource-management] -->
@@ -509,11 +498,11 @@ You can setup your SDK to emit debug logs for SDK requests and responses.
 
 You can pass your own logger class directly into your SDK.
 ```python
-from sudo import Sudo
+from sudo_ai import Sudo
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-s = Sudo(server_url="https://example.com", debug_logger=logging.getLogger("sudo"))
+s = Sudo(server_url="https://example.com", debug_logger=logging.getLogger("sudo_ai"))
 ```
 
 You can also enable a default debug logger by setting an environment variable `SUDO_DEBUG` to true.

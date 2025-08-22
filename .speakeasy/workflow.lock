@@ -1,0 +1,37 @@
+speakeasyVersion: 1.606.3
+sources:
+    sudo-api:
+        sourceNamespace: sudo-api
+        sourceRevisionDigest: sha256:b6115af055ed47447fe777717a731d24af09de0b14650602c64c681cb23a4029
+        sourceBlobDigest: sha256:3da92fac7b3ae4c4388e0d9a704e99cfe36cabb9e9b016302feb29d8c15942e0
+        tags:
+            - latest
+            - 0.1.0
+targets:
+    sudo:
+        source: sudo-api
+        sourceNamespace: sudo-api
+        sourceRevisionDigest: sha256:b6115af055ed47447fe777717a731d24af09de0b14650602c64c681cb23a4029
+        sourceBlobDigest: sha256:3da92fac7b3ae4c4388e0d9a704e99cfe36cabb9e9b016302feb29d8c15942e0
+        codeSamplesNamespace: sudo-api-python-code-samples
+        codeSamplesRevisionDigest: sha256:ceebbf7f7f26d3a65d58af3626e64945c3374da3a85e7ebc9ee9a3c365e114ed
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        sudo-api:
+            inputs:
+                - location: openapi.json
+            output: .speakeasy/out.openapi.yaml
+            registry:
+                location: registry.speakeasyapi.dev/committee-services/default/sudo-api
+    targets:
+        sudo:
+            target: python
+            source: sudo-api
+            codeSamples:
+                registry:
+                    location: registry.speakeasyapi.dev/committee-services/default/sudo-api-python-code-samples
+                labelOverride:
+                    fixedValue: Python (SDK)
+                blocking: false
