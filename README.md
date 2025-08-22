@@ -23,29 +23,43 @@ Developer-friendly & type-safe Python SDK specifically catered to leverage *sudo
 <!-- Start Table of Contents [toc] -->
 ## Table of Contents
 <!-- $toc-max-depth=2 -->
-* [sudo](#sudo)
-  * [SDK Installation](#sdk-installation)
-  * [IDE Support](#ide-support)
-  * [SDK Example Usage](#sdk-example-usage)
-  * [Authentication](#authentication)
-  * [Available Resources and Operations](#available-resources-and-operations)
-  * [Server-sent event streaming](#server-sent-event-streaming)
-  * [Retries](#retries)
-  * [Error Handling](#error-handling)
-  * [Custom HTTP Client](#custom-http-client)
-  * [Resource Management](#resource-management)
-  * [Debugging](#debugging)
-* [Development](#development)
-  * [Maturity](#maturity)
-  * [Contributions](#contributions)
+- [sudo](#sudo)
+  - [Summary](#summary)
+  - [Table of Contents](#table-of-contents)
+  - [SDK Installation](#sdk-installation)
+    - [uv](#uv)
+    - [PIP](#pip)
+    - [Poetry](#poetry)
+    - [Shell and script usage with `uv`](#shell-and-script-usage-with-uv)
+  - [IDE Support](#ide-support)
+    - [PyCharm](#pycharm)
+  - [SDK Example Usage](#sdk-example-usage)
+    - [Example](#example)
+  - [Authentication](#authentication)
+    - [Per-Client Security Schemes](#per-client-security-schemes)
+  - [Available Resources and Operations](#available-resources-and-operations)
+    - [router](#router)
+    - [system](#system)
+  - [Server-sent event streaming](#server-sent-event-streaming)
+  - [Retries](#retries)
+  - [Error Handling](#error-handling)
+    - [Example](#example-1)
+    - [Error Classes](#error-classes)
+  - [Custom HTTP Client](#custom-http-client)
+  - [Resource Management](#resource-management)
+  - [Debugging](#debugging)
+- [Development](#development)
+  - [Maturity](#maturity)
+  - [Contributions](#contributions)
+    - [SDK Created by Speakeasy](#sdk-created-by-speakeasy)
 
 <!-- End Table of Contents [toc] -->
 
 <!-- Start SDK Installation [installation] -->
 ## SDK Installation
 
-> [!TIP]
-> To finish publishing your SDK to PyPI you must [run your first generation action](https://www.speakeasy.com/docs/github-setup#step-by-step-guide).
+<!-- > [!TIP]
+> To finish publishing your SDK to PyPI you must [run your first generation action](https://www.speakeasy.com/docs/github-setup#step-by-step-guide). -->
 
 
 > [!NOTE]
@@ -60,7 +74,7 @@ The SDK can be installed with *uv*, *pip*, or *poetry* package managers.
 *uv* is a fast Python package installer and resolver, designed as a drop-in replacement for pip and pip-tools. It's recommended for its speed and modern Python tooling capabilities.
 
 ```bash
-uv add git+<UNSET>.git
+uv add sudo-ai
 ```
 
 ### PIP
@@ -68,7 +82,7 @@ uv add git+<UNSET>.git
 *PIP* is the default package installer for Python, enabling easy installation and management of packages from PyPI via the command line.
 
 ```bash
-pip install git+<UNSET>.git
+pip install sudo-ai
 ```
 
 ### Poetry
@@ -76,7 +90,7 @@ pip install git+<UNSET>.git
 *Poetry* is a modern tool that simplifies dependency management and package publishing by using a single `pyproject.toml` file to handle project metadata and dependencies.
 
 ```bash
-poetry add git+<UNSET>.git
+poetry add sudo-ai
 ```
 
 ### Shell and script usage with `uv`
@@ -248,15 +262,22 @@ with Sudo(
 
     res = sudo.router.create_streaming(messages=[
         {
-            "content": "<value>",
-            "role": "<value>",
+            "content": "You are a helpful assistant.",
+            "role": "developer",
         },
-    ], model="PT Cruiser", stream=True)
+        {
+            "content": "Hello! How are you?",
+            "role": "user",
+        },
+    ], model="gpt-4o")
 
     with res as event_stream:
-        for event in event_stream:
-            # handle event
-            print(event, flush=True)
+        for chunk in event_stream:
+            # Access the chunk data
+            if chunk.data and chunk.data.choices:
+                for choice in chunk.data.choices:
+                    if choice.delta and choice.delta.content:
+                        print(choice.delta.content, end="", flush=True)
 
 ```
 

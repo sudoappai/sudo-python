@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-uv build
-uv publish --token $PYPI_TOKEN
+export POETRY_PYPI_TOKEN_PYPI=${PYPI_TOKEN}
+
+poetry publish --build --skip-existing

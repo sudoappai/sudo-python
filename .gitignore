@@ -1,7 +1,6 @@
 .venv/
 src/*.egg-info/
 **/__pycache__/
-.speakeasy/reports
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
