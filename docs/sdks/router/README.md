@@ -12,6 +12,7 @@
 * [update_chat_completion](#update_chat_completion) - *[OpenAI Only]* Update a Chat Completion with some metadata. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.
 * [delete_chat_completion](#delete_chat_completion) - *[OpenAI Only]* Delete a stored Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.
 * [get_chat_completion_messages](#get_chat_completion_messages) - *[OpenAI Only]* Get the array of messages for a saved Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.
+* [generate_image](#generate_image) - Generate Image
 
 ## list_chat_completions
 
@@ -19,17 +20,18 @@
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="listChatCompletions" method="get" path="/v1/chat/completions" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.router.list_chat_completions()
+    res = sudo.router.list_chat_completions()
 
     # Handle response
     print(res)
@@ -53,11 +55,11 @@ with Sudo(
 
 ### Errors
 
-| Error Type           | Status Code          | Content Type         |
-| -------------------- | -------------------- | -------------------- |
-| errors.ErrorResponse | 401                  | application/json     |
-| errors.ErrorResponse | 500, 502             | application/json     |
-| errors.APIError      | 4XX, 5XX             | \*/\*                |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 401                     | application/json        |
+| errors.ErrorResponse    | 500, 502                | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
 
 ## create
 
@@ -65,17 +67,27 @@ Create a model response for the given string of prompts.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="create" method="post" path="/v1/chat/completions" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.router.create(messages=[], model="Camry", stream=False)
+    res = sudo.router.create(
+        messages=[
+        {
+            "content": "Hello! How are you?",
+            "role": "user",
+        }
+        ], 
+        model="gpt-4o", 
+        stream=False
+    )
 
     # Handle response
     print(res)
@@ -121,11 +133,11 @@ with Sudo(
 
 ### Errors
 
-| Error Type           | Status Code          | Content Type         |
-| -------------------- | -------------------- | -------------------- |
-| errors.ErrorResponse | 400, 401             | application/json     |
-| errors.ErrorResponse | 500, 502             | application/json     |
-| errors.APIError      | 4XX, 5XX             | \*/\*                |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401                | application/json        |
+| errors.ErrorResponse    | 500, 502                | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
 
 ## create_streaming
 
@@ -133,17 +145,18 @@ Create a streaming model response for the given string of prompts using server-s
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="createStreaming" method="post" path="/v1/chat/completions#stream" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.router.create_streaming(messages=[
+    res = sudo.router.create_streaming(messages=[
         {
             "content": "You are a helpful assistant.",
             "role": "developer",
@@ -204,11 +217,11 @@ with Sudo(
 
 ### Errors
 
-| Error Type           | Status Code          | Content Type         |
-| -------------------- | -------------------- | -------------------- |
-| errors.ErrorResponse | 400, 401             | application/json     |
-| errors.ErrorResponse | 500, 502             | application/json     |
-| errors.APIError      | 4XX, 5XX             | \*/\*                |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401                | application/json        |
+| errors.ErrorResponse    | 500, 502                | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
 
 ## get_chat_completion
 
@@ -216,17 +229,18 @@ with Sudo(
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="getChatCompletion" method="get" path="/v1/chat/completions/{completion_id}" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.router.get_chat_completion(completion_id="<id>")
+    res = sudo.router.get_chat_completion(completion_id="<id>")
 
     # Handle response
     print(res)
@@ -246,11 +260,11 @@ with Sudo(
 
 ### Errors
 
-| Error Type           | Status Code          | Content Type         |
-| -------------------- | -------------------- | -------------------- |
-| errors.ErrorResponse | 400, 401             | application/json     |
-| errors.ErrorResponse | 500, 502             | application/json     |
-| errors.APIError      | 4XX, 5XX             | \*/\*                |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401                | application/json        |
+| errors.ErrorResponse    | 500, 502                | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
 
 ## update_chat_completion
 
@@ -258,17 +272,18 @@ with Sudo(
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="updateChatCompletion" method="post" path="/v1/chat/completions/{completion_id}" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.router.update_chat_completion(completion_id="<id>", metadata={
+    res = sudo.router.update_chat_completion(completion_id="<id>", metadata={
 
     })
 
@@ -291,11 +306,11 @@ with Sudo(
 
 ### Errors
 
-| Error Type           | Status Code          | Content Type         |
-| -------------------- | -------------------- | -------------------- |
-| errors.ErrorResponse | 400, 401             | application/json     |
-| errors.ErrorResponse | 500, 502             | application/json     |
-| errors.APIError      | 4XX, 5XX             | \*/\*                |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401                | application/json        |
+| errors.ErrorResponse    | 500, 502                | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
 
 ## delete_chat_completion
 
@@ -303,17 +318,18 @@ with Sudo(
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="deleteChatCompletion" method="delete" path="/v1/chat/completions/{completion_id}" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.router.delete_chat_completion(completion_id="<id>")
+    res = sudo.router.delete_chat_completion(completion_id="<id>")
 
     # Handle response
     print(res)
@@ -333,11 +349,11 @@ with Sudo(
 
 ### Errors
 
-| Error Type           | Status Code          | Content Type         |
-| -------------------- | -------------------- | -------------------- |
-| errors.ErrorResponse | 400, 401             | application/json     |
-| errors.ErrorResponse | 500, 502             | application/json     |
-| errors.APIError      | 4XX, 5XX             | \*/\*                |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401                | application/json        |
+| errors.ErrorResponse    | 500, 502                | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
 
 ## get_chat_completion_messages
 
@@ -345,17 +361,18 @@ with Sudo(
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="getChatCompletionMessages" method="get" path="/v1/chat/completions/{completion_id}/messages" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.router.get_chat_completion_messages(completion_id="<id>")
+    res = sudo.router.get_chat_completion_messages(completion_id="<id>")
 
     # Handle response
     print(res)
@@ -378,8 +395,61 @@ with Sudo(
 
 ### Errors
 
-| Error Type           | Status Code          | Content Type         |
-| -------------------- | -------------------- | -------------------- |
-| errors.ErrorResponse | 400, 401             | application/json     |
-| errors.ErrorResponse | 500, 502             | application/json     |
-| errors.APIError      | 4XX, 5XX             | \*/\*                |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401                | application/json        |
+| errors.ErrorResponse    | 500, 502                | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
+
+## generate_image
+
+Generate Image
+
+### Example Usage
+
+<!-- UsageSnippet language="python" operationID="generateImage" method="post" path="/v1/images/generations" -->
+```python
+import os
+from sudo_ai import Sudo
+
+
+with Sudo(
+    server_url="https://api.example.com",
+    api_key=os.getenv("SUDO_API_KEY", ""),
+) as sudo:
+
+    res = sudo.router.generate_image(prompt="<value>", model="gpt-image-1")
+
+    # Handle response
+    print(res)
+
+```
+
+### Parameters
+
+| Parameter                                                                                                                                                                                                                                                                          | Type                                                                                                                                                                                                                                                                               | Required                                                                                                                                                                                                                                                                           | Description                                                                                                                                                                                                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `prompt`                                                                                                                                                                                                                                                                           | *str*                                                                                                                                                                                                                                                                              | :heavy_check_mark:                                                                                                                                                                                                                                                                 | A text description of the desired image(s). The maximum length is 1000 characters for dall-e-2 and 4000 characters for dall-e-3.                                                                                                                                                   |
+| `model`                                                                                                                                                                                                                                                                            | *str*                                                                                                                                                                                                                                                                              | :heavy_check_mark:                                                                                                                                                                                                                                                                 | The model to use for image generation.                                                                                                                                                                                                                                             |
+| `n`                                                                                                                                                                                                                                                                                | *OptionalNullable[int]*                                                                                                                                                                                                                                                            | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.                                                                                                                                                                                   |
+| `response_format`                                                                                                                                                                                                                                                                  | [OptionalNullable[models.ResponseFormatEnum]](../../models/responseformatenum.md)                                                                                                                                                                                                  | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | The format in which the generated images are returned. Must be one of url or b64_json. URLs are only valid for 60 minutes after the image has been generated.                                                                                                                      |
+| `quality`                                                                                                                                                                                                                                                                          | [OptionalNullable[models.Quality]](../../models/quality.md)                                                                                                                                                                                                                        | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image. This param is only supported for dall-e-3.                                                                                                         |
+| `size`                                                                                                                                                                                                                                                                             | [OptionalNullable[models.Size]](../../models/size.md)                                                                                                                                                                                                                              | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024 for dall-e-2. Must be one of 1024x1024, 1792x1024, or 1024x1792 for dall-e-3 models.                                                                                                               |
+| `style`                                                                                                                                                                                                                                                                            | [OptionalNullable[models.Style]](../../models/style.md)                                                                                                                                                                                                                            | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This param is only supported for dall-e-3. |
+| `background`                                                                                                                                                                                                                                                                       | *OptionalNullable[str]*                                                                                                                                                                                                                                                            | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | OpenAI only: Specify the background removal for the generated image.                                                                                                                                                                                                               |
+| `moderation`                                                                                                                                                                                                                                                                       | *OptionalNullable[str]*                                                                                                                                                                                                                                                            | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | OpenAI only: Content moderation settings for the image generation.                                                                                                                                                                                                                 |
+| `output_compression`                                                                                                                                                                                                                                                               | *OptionalNullable[int]*                                                                                                                                                                                                                                                            | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | OpenAI only: Compression level for the output image, from 0 to 100.                                                                                                                                                                                                                |
+| `output_format`                                                                                                                                                                                                                                                                    | *OptionalNullable[str]*                                                                                                                                                                                                                                                            | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | OpenAI only: The output format for the generated image.                                                                                                                                                                                                                            |
+| `retries`                                                                                                                                                                                                                                                                          | [Optional[utils.RetryConfig]](../../models/utils/retryconfig.md)                                                                                                                                                                                                                   | :heavy_minus_sign:                                                                                                                                                                                                                                                                 | Configuration to override the default retry behavior of the client.                                                                                                                                                                                                                |
+
+### Response
+
+**[models.ImageGeneration](../../models/imagegeneration.md)**
+
+### Errors
+
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 400, 401                | application/json        |
+| errors.ErrorResponse    | 500, 502                | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |

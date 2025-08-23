@@ -34,7 +34,7 @@ import pytest
 from typing import Dict, List, Any
 import requests
 
-from sudo import Sudo, models, errors
+from sudo_ai import Sudo, models, errors
 
 
 class SudoTestConfig:
@@ -68,6 +68,8 @@ class SudoTestConfig:
                 api_key=self.api_key
             )
         return self.client
+    
+
 
 
 @pytest.fixture(scope="session")
@@ -80,6 +82,9 @@ def config():
 def client(config):
     """Shared SDK client."""
     return config.get_client()
+
+
+
 
 
 class TestSystemMethods:
@@ -622,6 +627,83 @@ class TestReasoningModels:
 #         assert delete_response.deleted is True
 
 
+class TestImageGeneration:
+    """Test image generation capabilities."""
+    
+    def test_generate_image_with_gpt_image_1(self, client):
+        """Test image generation with gpt-image-1 model."""
+        prompt = "A beautiful sunset over a mountain landscape with vibrant colors"
+        
+        try:
+            response = client.router.generate_image(
+                model="gpt-image-1",
+                prompt=prompt,
+                n=1,
+                size="1024x1024"
+            )
+            
+            # Check response structure
+            assert response is not None
+            assert hasattr(response, 'data')
+            assert isinstance(response.data, list)
+            assert len(response.data) > 0
+            
+            # Check first image data
+            first_image = response.data[0]
+            assert hasattr(first_image, 'b64_json')
+            assert isinstance(first_image.b64_json, str)
+            assert len(first_image.b64_json) > 0
+            
+            # Check optional fields that might be present
+            if hasattr(response, 'created'):
+                assert isinstance(response.created, int)
+                assert response.created > 0
+                
+            if hasattr(response, 'usage'):
+                usage = response.usage
+                if hasattr(usage, 'prompt_tokens'):
+                    assert isinstance(usage.prompt_tokens, int)
+                    assert usage.prompt_tokens >= 0
+                    
+        except Exception as e:
+            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
+                pytest.skip(f"Image generation model not available: {e}")
+            else:
+                raise
+    
+    def test_generate_image_with_url_format(self, client):
+        """Test image generation with base64 response format."""
+        prompt = "A simple geometric pattern in blue and white"
+        
+        try:
+            response = client.router.generate_image(
+                model="dall-e-3",
+                prompt=prompt,
+                response_format="url",
+                n=1,
+                size="1024x1024"
+            )
+            
+            # Check response structure
+            assert response is not None
+            assert hasattr(response, 'data')
+            assert isinstance(response.data, list)
+            assert len(response.data) > 0
+            
+            # Check first image data
+            first_image = response.data[0]
+            assert hasattr(first_image, 'url')
+            assert isinstance(first_image.url, str)
+            assert len(first_image.url) > 0
+            
+                
+        except Exception as e:
+            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
+                pytest.skip(f"Image generation model not available: {e}")
+            else:
+                raise
+
+
 class TestErrorHandling:
     """Test error handling and edge cases."""
     
@@ -663,4 +745,4 @@ class TestErrorHandling:
 
 if __name__ == "__main__":
     # Run tests with pytest
-    pytest.main([__file__, "-v"]) 
+    pytest.main([__file__, "-v"])

@@ -14,17 +14,18 @@ Check if the Sudo API and backend infrastructure are health and ready to accept 
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="healthCheck" method="get" path="/system/health" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.system.health_check()
+    res = sudo.system.health_check()
 
     # Handle response
     print(res)
@@ -43,9 +44,9 @@ with Sudo(
 
 ### Errors
 
-| Error Type      | Status Code     | Content Type    |
-| --------------- | --------------- | --------------- |
-| errors.APIError | 4XX, 5XX        | \*/\*           |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
 
 ## get_supported_models
 
@@ -53,17 +54,18 @@ Get a list of all AI models supported in the Sudo API.
 
 ### Example Usage
 
+<!-- UsageSnippet language="python" operationID="getSupportedModels" method="get" path="/v1/models" -->
 ```python
 import os
-from sudo import Sudo
+from sudo_ai import Sudo
 
 
 with Sudo(
     server_url="https://api.example.com",
     api_key=os.getenv("SUDO_API_KEY", ""),
-) as s_client:
+) as sudo:
 
-    res = s_client.system.get_supported_models()
+    res = sudo.system.get_supported_models()
 
     # Handle response
     print(res)
@@ -82,8 +84,8 @@ with Sudo(
 
 ### Errors
 
-| Error Type           | Status Code          | Content Type         |
-| -------------------- | -------------------- | -------------------- |
-| errors.ErrorResponse | 401                  | application/json     |
-| errors.ErrorResponse | 500                  | application/json     |
-| errors.APIError      | 4XX, 5XX             | \*/\*                |
+| Error Type              | Status Code             | Content Type            |
+| ----------------------- | ----------------------- | ----------------------- |
+| errors.ErrorResponse    | 401                     | application/json        |
+| errors.ErrorResponse    | 500                     | application/json        |
+| errors.SudoDefaultError | 4XX, 5XX                | \*/\*                   |
