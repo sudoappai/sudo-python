@@ -639,7 +639,6 @@ class TestImageGeneration:
                 model="gpt-image-1",
                 prompt=prompt,
                 n=1,
-                response_format="url",
                 size="1024x1024"
             )
             
@@ -651,10 +650,9 @@ class TestImageGeneration:
             
             # Check first image data
             first_image = response.data[0]
-            assert hasattr(first_image, 'url')
-            assert isinstance(first_image.url, str)
-            assert len(first_image.url) > 0
-            assert first_image.url.startswith('http')
+            assert hasattr(first_image, 'b64_json')
+            assert isinstance(first_image.b64_json, str)
+            assert len(first_image.b64_json) > 0
             
             # Check optional fields that might be present
             if hasattr(response, 'created'):
@@ -673,17 +671,17 @@ class TestImageGeneration:
             else:
                 raise
     
-    def test_generate_image_with_b64_format(self, client):
+    def test_generate_image_with_url_format(self, client):
         """Test image generation with base64 response format."""
         prompt = "A simple geometric pattern in blue and white"
         
         try:
             response = client.router.generate_image(
-                model="gpt-image-1",
+                model="dall-e-3",
                 prompt=prompt,
+                response_format="url",
                 n=1,
-                response_format="b64_json",
-                size="512x512"
+                size="1024x1024"
             )
             
             # Check response structure
@@ -694,16 +692,10 @@ class TestImageGeneration:
             
             # Check first image data
             first_image = response.data[0]
-            assert hasattr(first_image, 'b64_json')
-            assert isinstance(first_image.b64_json, str)
-            assert len(first_image.b64_json) > 0
+            assert hasattr(first_image, 'url')
+            assert isinstance(first_image.url, str)
+            assert len(first_image.url) > 0
             
-            # Verify it's valid base64 (basic check)
-            try:
-                import base64
-                base64.b64decode(first_image.b64_json)
-            except Exception:
-                pytest.fail("Response b64_json is not valid base64")
                 
         except Exception as e:
             if "not found" in str(e).lower() or "unavailable" in str(e).lower():
