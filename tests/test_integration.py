@@ -37,7 +37,42 @@ import requests
 from sudo_ai import Sudo, models, errors
 
 
-class SudoTestConfig:
+def handle_provider_errors(e: Exception, model_name: str | None = None, test_type: str = "test") -> None:
+    """
+    Handle common provider errors with graceful skipping.
+    
+    Args:
+        e: The exception that was caught
+        model_name: The model that was being tested (optional)
+        test_type: The type of test being run (for logging context)
+    """
+    error_str = str(e).lower()
+    
+    # Handle 503 overloaded errors from providers (especially Anthropic)
+    if ("503" in error_str and 
+        ("overloaded_error" in error_str or 
+         "upstream_rate_limited" in error_str or
+         "overloaded" in error_str)):
+        model_info = f" for model {model_name}" if model_name else ""
+        print(f"Warning: Provider temporarily overloaded (503){model_info}: {e}")
+        pytest.skip(f"Provider temporarily overloaded (503){model_info}")
+        
+    # Handle 502 bad gateway errors (especially for image generation)
+    if "502" in error_str and ("bad gateway" in error_str or "gateway" in error_str):
+        model_info = f" for model {model_name}" if model_name else ""
+        print(f"Warning: Service temporarily unavailable (502){model_info}: {e}")
+        pytest.skip(f"Service temporarily unavailable (502){model_info}")
+    
+    # Handle existing error cases
+    if "not found" in error_str or "unavailable" in error_str:
+        model_info = f"Model {model_name}" if model_name else "Service"
+        pytest.skip(f"{model_info} not available: {e}")
+    
+    # Re-raise other errors
+    raise e
+
+
+    class SudoTestConfig:
     """Test configuration and setup utilities."""
     
     def __init__(self):
@@ -92,23 +127,29 @@ class TestSystemMethods:
     
     def test_health_check(self, client):
         """Test system health check endpoint."""
-        response = client.system.health_check()
-        assert response is not None
+        try:
+            response = client.system.health_check()
+            assert response is not None
+        except Exception as e:
+            handle_provider_errors(e, test_type="health_check")
         
     def test_get_models(self, client):
         """Test getting available models."""
-        response = client.system.get_supported_models()
-        
-        assert response is not None
-        assert hasattr(response, 'data')
-        assert isinstance(response.data, list)
-        assert len(response.data) > 0
-        
-        # Check first model structure
-        first_model = response.data[0]
-        assert hasattr(first_model, 'model_name')
-        assert isinstance(first_model.model_name, str)
-        assert len(first_model.model_name) > 0
+        try:
+            response = client.system.get_supported_models()
+            
+            assert response is not None
+            assert hasattr(response, 'data')
+            assert isinstance(response.data, list)
+            assert len(response.data) > 0
+            
+            # Check first model structure
+            first_model = response.data[0]
+            assert hasattr(first_model, 'model_name')
+            assert isinstance(first_model.model_name, str)
+            assert len(first_model.model_name) > 0
+        except Exception as e:
+            handle_provider_errors(e, test_type="get_models")
 
 
 class TestBasicChatCompletions:
@@ -180,11 +221,7 @@ class TestBasicChatCompletions:
             assert usage.total_tokens == usage.prompt_tokens + usage.completion_tokens
             
         except Exception as e:
-            # Some models might not be available or have issues
-            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
-                pytest.skip(f"Model {model_name} not available: {e}")
-            else:
-                raise
+            handle_provider_errors(e, model_name, "basic_chat_completion")
 
 
 class TestStreamingCompletions:
@@ -228,10 +265,7 @@ class TestStreamingCompletions:
             assert len(content_received) > 0, "Expected to receive some content"
             
         except Exception as e:
-            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
-                pytest.skip(f"Model {model_name} not available: {e}")
-            else:
-                raise
+            handle_provider_errors(e, model_name, "streaming_chat_completion")
 
 
 class TestToolCalling:
@@ -322,9 +356,11 @@ class TestToolCalling:
                 break  # Success with one model is enough
                 
             except Exception as e:
-                if "not found" in str(e).lower() or "unavailable" in str(e).lower():
+                try:
+                    handle_provider_errors(e, model_name, "tool_calling")
+                except pytest.skip.Exception:
                     continue  # Try next model
-                else:
+                except Exception:
                     raise
         else:
             pytest.fail("No supported models available for tool calling")
@@ -377,10 +413,7 @@ class TestImageInput:
             assert hasattr(response, 'usage')
             
         except Exception as e:
-            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
-                pytest.skip(f"Vision model not available: {e}")
-            else:
-                raise
+            handle_provider_errors(e, "gpt-4o", "image_input")
 
 
 class TestStructuredOutput:
@@ -454,10 +487,7 @@ class TestStructuredOutput:
             assert isinstance(first_step["output"], str)
             
         except Exception as e:
-            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
-                pytest.skip(f"Structured output not available: {e}")
-            else:
-                raise
+            handle_provider_errors(e, "gpt-4o", "structured_output")
 
 
 class TestReasoningModels:
@@ -492,10 +522,7 @@ class TestReasoningModels:
                     assert details.reasoning_tokens >= 0
             
         except Exception as e:
-            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
-                pytest.skip(f"Reasoning model not available: {e}")
-            else:
-                raise
+            handle_provider_errors(e, "o4-mini", "reasoning_model")
 
 
 # class TestStoredCompletions:
@@ -666,13 +693,10 @@ class TestImageGeneration:
                     assert usage.prompt_tokens >= 0
                     
         except Exception as e:
-            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
-                pytest.skip(f"Image generation model not available: {e}")
-            else:
-                raise
+            handle_provider_errors(e, "gpt-image-1", "image_generation")
     
     def test_generate_image_with_url_format(self, client):
-        """Test image generation with base64 response format."""
+        """Test image generation with URL response format."""
         prompt = "A simple geometric pattern in blue and white"
         
         try:
@@ -698,10 +722,7 @@ class TestImageGeneration:
             
                 
         except Exception as e:
-            if "not found" in str(e).lower() or "unavailable" in str(e).lower():
-                pytest.skip(f"Image generation model not available: {e}")
-            else:
-                raise
+            handle_provider_errors(e, "dall-e-3", "image_generation")
 
 
 class TestErrorHandling:
