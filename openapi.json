@@ -1486,9 +1486,13 @@
                                 "description": "A list of chat completion choices."
                             },
                             "usage": {
-                                "$ref": "#/components/schemas/Usage",
+                                "allOf": [
+                                    {
+                                        "$ref": "#/components/schemas/Usage"
+                                    }
+                                ],
                                 "nullable": true,
-                                "description": "Usage statistics for the completion request. Only present in the final chunk when stream_options.include_usage is set."
+                                "description": "Usage statistics for the completion request. When stream_options.include_usage is set, the final chunk before [DONE] will contain the full usage statistics, and all other chunks will include usage with a null value."
                             }
                         }
                     }

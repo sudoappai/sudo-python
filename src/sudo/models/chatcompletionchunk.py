@@ -32,7 +32,7 @@ class DataTypedDict(TypedDict):
     r"""A list of chat completion choices."""
     system_fingerprint: NotRequired[Nullable[str]]
     r"""This fingerprint represents the backend configuration that the model runs with."""
-    usage: NotRequired[UsageTypedDict]
+    usage: NotRequired[Nullable[UsageTypedDict]]
 
 
 class Data(BaseModel):
@@ -54,12 +54,12 @@ class Data(BaseModel):
     system_fingerprint: OptionalNullable[str] = UNSET
     r"""This fingerprint represents the backend configuration that the model runs with."""
 
-    usage: Optional[Usage] = None
+    usage: OptionalNullable[Usage] = UNSET
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):
         optional_fields = ["system_fingerprint", "usage"]
-        nullable_fields = ["system_fingerprint"]
+        nullable_fields = ["system_fingerprint", "usage"]
         null_default_fields = []
 
         serialized = handler(self)
