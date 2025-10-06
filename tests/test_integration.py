@@ -72,7 +72,7 @@ def handle_provider_errors(e: Exception, model_name: str | None = None, test_typ
     raise e
 
 
-    class SudoTestConfig:
+class SudoTestConfig:
     """Test configuration and setup utilities."""
     
     def __init__(self):
