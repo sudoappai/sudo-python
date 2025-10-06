@@ -31,13 +31,13 @@ import json
 import base64
 import time
 import pytest
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import requests
 
 from sudo_ai import Sudo, models, errors
 
 
-def handle_provider_errors(e: Exception, model_name: str | None = None, test_type: str = "test") -> None:
+def handle_provider_errors(e: Exception, model_name: Optional[str] = None, test_type: str = "test") -> None:
     """
     Handle common provider errors with graceful skipping.
     
@@ -86,7 +86,7 @@ class SudoTestConfig:
         # Test models with their capabilities
         self.test_models = {
             "gpt-4o": {"has_id": True, "has_created": True, "supports_tools": True, "supports_vision": True},
-            "claude-3-5-sonnet-20241022": {"has_id": True, "has_created": True, "supports_tools": True, "supports_vision": True},
+            "claude-3-7-sonnet-20250219": {"has_id": True, "has_created": True, "supports_tools": True, "supports_vision": True},
             "deepseek-chat": {"has_id": True, "has_created": True, "supports_tools": False, "supports_vision": False},
             "grok-3": {"has_id": True, "has_created": True, "supports_tools": False, "supports_vision": False},
             "gemini-2.0-flash": {"has_id": False, "has_created": False, "supports_tools": True, "supports_vision": True},
@@ -155,7 +155,7 @@ class TestSystemMethods:
 class TestBasicChatCompletions:
     """Test basic chat completion functionality."""
     
-    @pytest.mark.parametrize("model_name", ["gpt-4o", "claude-3-5-sonnet-20241022", "deepseek-chat", "grok-3", "gemini-2.0-flash"])
+    @pytest.mark.parametrize("model_name", ["gpt-4o", "claude-3-7-sonnet-20250219", "deepseek-chat", "grok-3", "gemini-2.0-flash"])
     def test_create_chat_completion_basic(self, client, config, model_name):
         """Test basic chat completions with different models."""
         model_config = config.test_models.get(model_name, {})
@@ -227,7 +227,7 @@ class TestBasicChatCompletions:
 class TestStreamingCompletions:
     """Test streaming chat completions."""
     
-    @pytest.mark.parametrize("model_name", ["gpt-4o", "claude-3-5-sonnet-20241022", "deepseek-chat", "grok-3", "gemini-2.0-flash"])
+    @pytest.mark.parametrize("model_name", ["gpt-4o", "claude-3-7-sonnet-20250219", "deepseek-chat", "grok-3", "gemini-2.0-flash"])
     def test_create_chat_completion_streaming(self, client, model_name):
         """Test streaming chat completions."""
         messages = [
@@ -274,7 +274,7 @@ class TestToolCalling:
     def test_create_chat_completion_tool_call(self, client):
         """Test tool calling with supported models."""
         # Only test with models that support tools
-        for model_name in ["gpt-4o", "claude-3-5-sonnet-20241022"]:
+        for model_name in ["gpt-4o", "claude-3-7-sonnet-20250219"]:
             messages = [
                 {
                     "role": "system",
