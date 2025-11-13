@@ -5,7 +5,7 @@ management:
   docVersion: 0.1.0
   speakeasyVersion: 1.656.2
   generationVersion: 2.753.6
-  releaseVersion: 0.3.0
+  releaseVersion: 0.2.0
   configChecksum: 6f9cc5654f98f75cd9d6933ed1a3feb1
 features:
   python:

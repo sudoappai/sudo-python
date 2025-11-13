@@ -3,10 +3,10 @@
 import importlib.metadata
 
 __title__: str = "sudo-ai"
-__version__: str = "0.3.0"
+__version__: str = "0.2.0"
 __openapi_doc_version__: str = "0.1.0"
 __gen_version__: str = "2.753.6"
-__user_agent__: str = "speakeasy-sdk/python 0.3.0 2.753.6 0.1.0 sudo-ai"
+__user_agent__: str = "speakeasy-sdk/python 0.2.0 2.753.6 0.1.0 sudo-ai"
 
 try:
     if __package__ is not None:
