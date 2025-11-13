@@ -1,3 +1,5 @@
+.speakeasy/reports
+.env.local
 .venv/
 src/*.egg-info/
 **/__pycache__/

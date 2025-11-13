@@ -78,16 +78,7 @@ with Sudo(
     api_key=os.getenv("SUDO_API_KEY", ""),
 ) as sudo:
 
-    res = sudo.router.create(
-        messages=[
-        {
-            "content": "Hello! How are you?",
-            "role": "user",
-        }
-        ], 
-        model="gpt-4o", 
-        stream=False
-    )
+    res = sudo.router.create(messages=[], model="Camry", stream=False)
 
     # Handle response
     print(res)
@@ -158,22 +149,15 @@ with Sudo(
 
     res = sudo.router.create_streaming(messages=[
         {
-            "content": "You are a helpful assistant.",
-            "role": "developer",
+            "content": "<value>",
+            "role": "<value>",
         },
-        {
-            "content": "Hello! How are you?",
-            "role": "user",
-        },
-    ], model="gpt-4o")
+    ], model="PT Cruiser", stream=True)
 
     with res as event_stream:
-        for chunk in event_stream:
-            # Access the chunk data
-            if chunk.data and chunk.data.choices:
-                for choice in chunk.data.choices:
-                    if choice.delta and choice.delta.content:
-                        print(choice.delta.content, end="", flush=True)
+        for event in event_stream:
+            # handle event
+            print(event, flush=True)
 
 ```
 
@@ -418,7 +402,7 @@ with Sudo(
     api_key=os.getenv("SUDO_API_KEY", ""),
 ) as sudo:
 
-    res = sudo.router.generate_image(prompt="<value>", model="gpt-image-1")
+    res = sudo.router.generate_image(prompt="<value>", model="PT Cruiser")
 
     # Handle response
     print(res)

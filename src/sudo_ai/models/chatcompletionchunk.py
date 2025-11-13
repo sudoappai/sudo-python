@@ -5,11 +5,10 @@ from .chatcompletionchunkchoice import (
     ChatCompletionChunkChoice,
     ChatCompletionChunkChoiceTypedDict,
 )
-from .usage import Usage, UsageTypedDict
 from enum import Enum
 from pydantic import model_serializer
 from sudo_ai.types import BaseModel, Nullable, OptionalNullable, UNSET, UNSET_SENTINEL
-from typing import List, Optional
+from typing import Any, List, Optional
 from typing_extensions import NotRequired, TypedDict
 
 
@@ -17,6 +16,30 @@ class Object(str, Enum):
     r"""The object type, which is always 'chat.completion.chunk'."""
 
     CHAT_COMPLETION_CHUNK = "chat.completion.chunk"
+
+
+class ChatCompletionChunkUsageTypedDict(TypedDict):
+    r"""Usage statistics for the completion request. When stream_options.include_usage is set, the final chunk before [DONE] will contain the full usage statistics, and all other chunks will include usage with a null value."""
+
+    completion_tokens: int
+    prompt_tokens: int
+    total_tokens: int
+    completion_tokens_details: NotRequired[Any]
+    prompt_tokens_details: NotRequired[Any]
+
+
+class ChatCompletionChunkUsage(BaseModel):
+    r"""Usage statistics for the completion request. When stream_options.include_usage is set, the final chunk before [DONE] will contain the full usage statistics, and all other chunks will include usage with a null value."""
+
+    completion_tokens: int
+
+    prompt_tokens: int
+
+    total_tokens: int
+
+    completion_tokens_details: Optional[Any] = None
+
+    prompt_tokens_details: Optional[Any] = None
 
 
 class DataTypedDict(TypedDict):
@@ -32,7 +55,8 @@ class DataTypedDict(TypedDict):
     r"""A list of chat completion choices."""
     system_fingerprint: NotRequired[Nullable[str]]
     r"""This fingerprint represents the backend configuration that the model runs with."""
-    usage: NotRequired[Nullable[UsageTypedDict]]
+    usage: NotRequired[Nullable[ChatCompletionChunkUsageTypedDict]]
+    r"""Usage statistics for the completion request. When stream_options.include_usage is set, the final chunk before [DONE] will contain the full usage statistics, and all other chunks will include usage with a null value."""
 
 
 class Data(BaseModel):
@@ -54,7 +78,8 @@ class Data(BaseModel):
     system_fingerprint: OptionalNullable[str] = UNSET
     r"""This fingerprint represents the backend configuration that the model runs with."""
 
-    usage: OptionalNullable[Usage] = UNSET
+    usage: OptionalNullable[ChatCompletionChunkUsage] = UNSET
+    r"""Usage statistics for the completion request. When stream_options.include_usage is set, the final chunk before [DONE] will contain the full usage statistics, and all other chunks will include usage with a null value."""
 
     @model_serializer(mode="wrap")
     def serialize_model(self, handler):

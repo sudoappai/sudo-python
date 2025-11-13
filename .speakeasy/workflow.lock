@@ -1,9 +1,9 @@
-speakeasyVersion: 1.606.3
+speakeasyVersion: 1.656.2
 sources:
     sudo-api:
         sourceNamespace: sudo-api
-        sourceRevisionDigest: sha256:b6115af055ed47447fe777717a731d24af09de0b14650602c64c681cb23a4029
-        sourceBlobDigest: sha256:3da92fac7b3ae4c4388e0d9a704e99cfe36cabb9e9b016302feb29d8c15942e0
+        sourceRevisionDigest: sha256:ce941d886038ecbd35ad380c307e6ef25b311365f04ed941820c775e651af2a6
+        sourceBlobDigest: sha256:ad465108b6f7fe437b5fd121557ed153957b2d8cab592d757317c115e4727155
         tags:
             - latest
             - 0.1.0
@@ -11,10 +11,8 @@ targets:
     sudo:
         source: sudo-api
         sourceNamespace: sudo-api
-        sourceRevisionDigest: sha256:b6115af055ed47447fe777717a731d24af09de0b14650602c64c681cb23a4029
-        sourceBlobDigest: sha256:3da92fac7b3ae4c4388e0d9a704e99cfe36cabb9e9b016302feb29d8c15942e0
-        codeSamplesNamespace: sudo-api-python-code-samples
-        codeSamplesRevisionDigest: sha256:ceebbf7f7f26d3a65d58af3626e64945c3374da3a85e7ebc9ee9a3c365e114ed
+        sourceRevisionDigest: sha256:ce941d886038ecbd35ad380c307e6ef25b311365f04ed941820c775e651af2a6
+        sourceBlobDigest: sha256:ad465108b6f7fe437b5fd121557ed153957b2d8cab592d757317c115e4727155
 workflow:
     workflowVersion: 1.0.0
     speakeasyVersion: latest
