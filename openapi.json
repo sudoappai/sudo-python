@@ -763,6 +763,159 @@
                     }
                 ]
             }
+        },
+        "/v1/responses": {
+            "post": {
+                "tags": [
+                    "responses"
+                ],
+                "summary": "*[OpenAI Only]* Responses API: Create a model response for the given input",
+                "operationId": "createResponse",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResponsesRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Response created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad gateway error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
+        },
+        "/v1/responses#stream": {
+            "post": {
+                "tags": [
+                    "responses"
+                ],
+                "summary": "*[OpenAI Only]* Responses API: Create a streaming model response for the given input using server-sent events.",
+                "operationId": "createStreamingResponse",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResponsesRequestStream"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Response stream created successfully",
+                        "content": {
+                            "text/event-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseEvent"
+                                },
+                                "x-speakeasy-sse-sentinel": "[DONE]"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Bad gateway error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -2019,6 +2172,25 @@
                     }
                 }
             },
+            "ToolCallOutput": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "array",
+                        "items": {}
+                    }
+                ]
+            },
+            "ToolChoice": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {}
+                ]
+            },
             "Usage": {
                 "type": "object",
                 "required": [
@@ -2218,6 +2390,591 @@
                     }
                 }
             },
+            "IncompleteDetails": {
+                "type": "object",
+                "required": [
+                    "reason"
+                ],
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "description": "The reason the response is incomplete"
+                    }
+                }
+            },
+            "InputItem": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "required": [
+                            "content",
+                            "role"
+                        ],
+                        "properties": {
+                            "content": {
+                                "$ref": "#/components/schemas/MessageContent"
+                            },
+                            "role": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "$ref": "#/components/schemas/Item"
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "nullable": true
+                            }
+                        }
+                    }
+                ]
+            },
+            "Item": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "required": [
+                            "content",
+                            "role",
+                            "status",
+                            "type"
+                        ],
+                        "properties": {
+                            "content": {
+                                "$ref": "#/components/schemas/MessageContent"
+                            },
+                            "role": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "content",
+                            "id",
+                            "role",
+                            "status",
+                            "type"
+                        ],
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/OutputMessage"
+                                }
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "role": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "queries",
+                            "status",
+                            "results",
+                            "type"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "queries": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "results": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "action",
+                            "call_id",
+                            "id",
+                            "pending_safety_checks",
+                            "status",
+                            "type"
+                        ],
+                        "properties": {
+                            "action": {},
+                            "call_id": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "pending_safety_checks": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "call_id",
+                            "output",
+                            "type"
+                        ],
+                        "properties": {
+                            "acknowledged_safety_checks": {
+                                "type": "array",
+                                "nullable": true,
+                                "items": {}
+                            },
+                            "call_id": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "output": {},
+                            "status": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "action",
+                            "id",
+                            "status",
+                            "type"
+                        ],
+                        "properties": {
+                            "action": {},
+                            "id": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "arguments",
+                            "call_id",
+                            "name",
+                            "type"
+                        ],
+                        "properties": {
+                            "arguments": {
+                                "type": "string"
+                            },
+                            "call_id": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "call_id",
+                            "output",
+                            "type"
+                        ],
+                        "properties": {
+                            "call_id": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "output": {
+                                "$ref": "#/components/schemas/ToolCallOutput"
+                            },
+                            "status": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "summary",
+                            "type",
+                            "content"
+                        ],
+                        "properties": {
+                            "content": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "encrypted_content": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "summary": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "result",
+                            "status",
+                            "type"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "result": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "code",
+                            "container_id",
+                            "id",
+                            "outputs",
+                            "status",
+                            "type"
+                        ],
+                        "properties": {
+                            "code": {
+                                "type": "string"
+                            },
+                            "container_id": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "outputs": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "action",
+                            "call_id",
+                            "id",
+                            "status",
+                            "type"
+                        ],
+                        "properties": {
+                            "action": {},
+                            "call_id": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "output",
+                            "type"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "output": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "id",
+                            "server_label",
+                            "tools",
+                            "type"
+                        ],
+                        "properties": {
+                            "error": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "server_label": {
+                                "type": "string"
+                            },
+                            "tools": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "arguments",
+                            "id",
+                            "name",
+                            "server_label",
+                            "type"
+                        ],
+                        "properties": {
+                            "arguments": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "server_label": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "approval_request_id",
+                            "approve",
+                            "type"
+                        ],
+                        "properties": {
+                            "approval_request_id": {
+                                "type": "string"
+                            },
+                            "approve": {
+                                "type": "boolean"
+                            },
+                            "id": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "reason": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "arguments",
+                            "id",
+                            "name",
+                            "server_label",
+                            "type"
+                        ],
+                        "properties": {
+                            "approval_request_id": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "arguments": {
+                                "type": "string"
+                            },
+                            "error": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "output": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "server_label": {
+                                "type": "string"
+                            },
+                            "status": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "call_id",
+                            "output",
+                            "type"
+                        ],
+                        "properties": {
+                            "call_id": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "output": {
+                                "$ref": "#/components/schemas/ToolCallOutput"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "call_id",
+                            "input",
+                            "name",
+                            "type"
+                        ],
+                        "properties": {
+                            "call_id": {
+                                "type": "string"
+                            },
+                            "id": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "input": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ]
+            },
             "ImageInputTokens": {
                 "type": "object",
                 "required": [
@@ -2236,6 +2993,547 @@
                         "format": "int32",
                         "minimum": 0,
                         "description": "Number of tokens used for text processing."
+                    }
+                }
+            },
+            "OutputMessage": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "required": [
+                            "annotations",
+                            "text",
+                            "type"
+                        ],
+                        "properties": {
+                            "annotations": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "logprobs": {
+                                "type": "array",
+                                "nullable": true,
+                                "items": {}
+                            },
+                            "text": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "output_text"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "type": "object",
+                        "required": [
+                            "refusal",
+                            "type"
+                        ],
+                        "properties": {
+                            "refusal": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "refusal"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "Response": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "object",
+                    "created_at",
+                    "model",
+                    "status"
+                ],
+                "properties": {
+                    "background": {
+                        "type": "boolean",
+                        "nullable": true,
+                        "description": "Whether the response was generated in the background"
+                    },
+                    "conversation": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponseConversation"
+                            }
+                        ],
+                        "description": "The ID of the conversation this response belongs to",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (in seconds) when the response was created"
+                    },
+                    "error": {
+                        "description": "Error information if the response failed"
+                    },
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for the response"
+                    },
+                    "incomplete_details": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/IncompleteDetails"
+                            }
+                        ],
+                        "description": "Details about why the response is incomplete (if status is \"incomplete\")",
+                        "nullable": true
+                    },
+                    "instructions": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponseInstructions"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Instructions provided to the model"
+                    },
+                    "max_output_tokens": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Maximum number of output tokens",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "max_tool_calls": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Maximum number of tool calls",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "metadata": {
+                        "description": "Set of key-value pairs that can be attached to an object"
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "The model used to generate the response"
+                    },
+                    "object": {
+                        "type": "string",
+                        "description": "The object type, always \"response\""
+                    },
+                    "output": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Item"
+                        },
+                        "description": "The output items generated by the model",
+                        "nullable": true
+                    },
+                    "parallel_tool_calls": {
+                        "type": "boolean",
+                        "nullable": true,
+                        "description": "Whether parallel tool calls are enabled"
+                    },
+                    "previous_response_id": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "ID of the previous response"
+                    },
+                    "prompt": {
+                        "description": "Prompt configuration"
+                    },
+                    "prompt_cache_key": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Prompt cache key"
+                    },
+                    "reasoning": {
+                        "description": "Reasoning configuration"
+                    },
+                    "safety_identifier": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Safety identifier"
+                    },
+                    "service_tier": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Service tier used"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "The status of the response (e.g., \"in_progress\", \"completed\", \"failed\", \"cancelled\", \"incomplete\")"
+                    },
+                    "temperature": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true,
+                        "description": "Temperature sampling parameter"
+                    },
+                    "text": {
+                        "description": "Text configuration"
+                    },
+                    "tool_choice": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ToolChoice"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Tool choice configuration"
+                    },
+                    "tools": {
+                        "type": "array",
+                        "items": {},
+                        "nullable": true,
+                        "description": "Tools available to the model"
+                    },
+                    "top_logprobs": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true,
+                        "description": "Number of top log probabilities to return",
+                        "minimum": 0
+                    },
+                    "top_p": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true,
+                        "description": "Top-p sampling parameter"
+                    },
+                    "truncation": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Truncation strategy"
+                    },
+                    "usage": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponseUsage"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Usage statistics for the API call"
+                    }
+                }
+            },
+            "ResponseConversation": {
+                "type": "object",
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ResponseEvent": {
+                "additionalProperties": true
+            },
+            "ResponseInstructions": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "array",
+                        "items": {}
+                    }
+                ]
+            },
+            "ResponseUsage": {
+                "type": "object",
+                "required": [
+                    "input_tokens",
+                    "output_tokens",
+                    "total_tokens"
+                ],
+                "properties": {
+                    "input_tokens": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Number of tokens in the input",
+                        "minimum": 0
+                    },
+                    "input_tokens_details": {
+                        "description": "Breakdown of input token details"
+                    },
+                    "output_tokens": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Number of tokens in the output",
+                        "minimum": 0
+                    },
+                    "output_tokens_details": {
+                        "description": "Breakdown of output token details"
+                    },
+                    "total_tokens": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Total number of tokens used",
+                        "minimum": 0
+                    }
+                }
+            },
+            "ResponsesConvo": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {}
+                ]
+            },
+            "ResponsesInput": {
+                "oneOf": [
+                    {
+                        "type": "string"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/InputItem"
+                        }
+                    }
+                ]
+            },
+            "ResponsesRequest": {
+                "type": "object",
+                "properties": {
+                    "background": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "conversation": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponsesConvo"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "include": {
+                        "type": "array",
+                        "items": {},
+                        "nullable": true
+                    },
+                    "input": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponsesInput"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "instructions": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "max_output_tokens": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "max_tool_calls": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "metadata": {},
+                    "model": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "parallel_tool_calls": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "previous_response_id": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "prompt": {},
+                    "prompt_cache_key": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "reasoning": {},
+                    "safety_identifier": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "service_tier": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "store": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "stream": {
+                        "type": "boolean",
+                        "enum": [false],
+                        "default": false,
+                        "description": "If set, partial message deltas and streaming events will be sent. For regular HTTP responses, this must be false."
+                    },
+                    "stream_options": {},
+                    "temperature": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "text": {},
+                    "tool_choice": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ToolChoice"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "tools": {
+                        "type": "array",
+                        "items": {},
+                        "nullable": true
+                    },
+                    "top_logprobs": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "top_p": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "truncation": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            },
+            "ResponsesRequestStream": {
+                "type": "object",
+                "properties": {
+                    "background": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "conversation": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponsesConvo"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "include": {
+                        "type": "array",
+                        "items": {},
+                        "nullable": true
+                    },
+                    "input": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ResponsesInput"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "instructions": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "max_output_tokens": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "max_tool_calls": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "metadata": {},
+                    "model": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "parallel_tool_calls": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "previous_response_id": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "prompt": {},
+                    "prompt_cache_key": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "reasoning": {},
+                    "safety_identifier": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "service_tier": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "store": {
+                        "type": "boolean",
+                        "nullable": true
+                    },
+                    "stream": {
+                        "type": "boolean",
+                        "enum": [true],
+                        "default": true,
+                        "description": "If set, partial message deltas and streaming events will be sent. For streaming responses, this must be set to true."
+                    },
+                    "stream_options": {},
+                    "temperature": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "text": {},
+                    "tool_choice": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ToolChoice"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "tools": {
+                        "type": "array",
+                        "items": {},
+                        "nullable": true
+                    },
+                    "top_logprobs": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0,
+                        "nullable": true
+                    },
+                    "top_p": {
+                        "type": "number",
+                        "format": "float",
+                        "nullable": true
+                    },
+                    "truncation": {
+                        "type": "string",
+                        "nullable": true
                     }
                 }
             }
