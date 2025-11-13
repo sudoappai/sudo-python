@@ -25,7 +25,12 @@ with Sudo(
     api_key=os.getenv("SUDO_API_KEY", ""),
 ) as sudo:
 
-    res = sudo.responses.create_response(stream=False)
+    res = sudo.responses.create_response(
+        model="gpt-4o",
+        instructions="You are a helpful assistant.",
+        input="Hello! Give me a study plan to learn Python.",
+        stream=False
+    )
 
     # Handle response
     print(res)
@@ -93,7 +98,12 @@ with Sudo(
     api_key=os.getenv("SUDO_API_KEY", ""),
 ) as sudo:
 
-    res = sudo.responses.create_streaming_response(stream=True)
+    res = sudo.responses.create_streaming_response(
+        model="gpt-4o",
+        instructions="You are a helpful assistant.",
+        input="Hello! Give me a list of all the planets in the solar system, with a few sentences about each.",
+        stream=True
+    )
 
     with res as event_stream:
         for event in event_stream:
