@@ -38,6 +38,7 @@ Developer-friendly & type-safe Python SDK specifically catered to leverage *sudo
   - [Authentication](#authentication)
     - [Per-Client Security Schemes](#per-client-security-schemes)
   - [Available Resources and Operations](#available-resources-and-operations)
+    - [responses](#responses)
     - [router](#router)
     - [system](#system)
   - [Server-sent event streaming](#server-sent-event-streaming)
@@ -217,6 +218,11 @@ with Sudo(
 
 <details open>
 <summary>Available methods</summary>
+
+### [responses](docs/sdks/responses/README.md)
+
+* [create_response](docs/sdks/responses/README.md#create_response) - *[OpenAI Only]* Responses API: Create a model response for the given input
+* [create_streaming_response](docs/sdks/responses/README.md#create_streaming_response) - *[OpenAI Only]* Responses API: Create a streaming model response for the given input using server-sent events.
 
 ### [router](docs/sdks/router/README.md)
 

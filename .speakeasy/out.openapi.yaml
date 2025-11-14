@@ -1,2251 +1,2438 @@
-{
-    "openapi": "3.0.3",
-    "info": {
-        "title": "sudo-api",
-        "description": "",
-        "license": {
-            "name": ""
-        },
-        "version": "0.1.0"
-    },
-    "paths": {
-        "/system/health": {
-            "get": {
-                "tags": [
-                    "system"
-                ],
-                "summary": "Check if the Sudo API and backend infrastructure are health and ready to accept connections.",
-                "operationId": "healthCheck",
-                "responses": {
-                    "200": {
-                        "description": "Health check successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/chat/completions": {
-            "get": {
-                "tags": [
-                    "router"
-                ],
-                "summary": "*[OpenAI Only]* Get a list of saved Chat Completions. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.",
-                "operationId": "listChatCompletions",
-                "parameters": [
-                    {
-                        "name": "after",
-                        "in": "query",
-                        "description": "Identifier for the last chat completion from the previous pagination request.",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Number of Chat Completions to retrieve.",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int32",
-                            "minimum": 0
-                        }
-                    },
-                    {
-                        "name": "metadata",
-                        "in": "query",
-                        "description": "A list of metadata keys to filter the Chat Completions by. Example: metadata[key1]=value1&metadata[key2]=value2",
-                        "required": false,
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    {
-                        "name": "model",
-                        "in": "query",
-                        "description": "The model used to generate the Chat Completions.",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "order",
-                        "in": "query",
-                        "description": "Sort order for Chat Completions by timestamp. Use asc for ascending order or desc for descending order. Defaults to asc.",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Chat completions listed successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ChatCompletionList"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "502": {
-                        "description": "Bad gateway error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "router"
-                ],
-                "summary": "Create a model response for the given string of prompts.",
-                "operationId": "create",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ChatCompletionRequestJson"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Chat completion created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ChatCompletion"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "502": {
-                        "description": "Bad gateway error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            }
-        },
-        "/v1/chat/completions#stream": {
-            "post": {
-                "tags": [
-                    "router"
-                ],
-                "summary": "Create a streaming model response for the given string of prompts using server-sent events.",
-                "operationId": "createStreaming",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ChatCompletionRequestStream"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Chat completion stream created successfully",
-                        "content": {
-                            "text/event-stream": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ChatCompletionChunk"
-                                },
-                                "x-speakeasy-sse-sentinel": "[DONE]"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "502": {
-                        "description": "Bad gateway error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            }
-        },
-        "/v1/chat/completions/{completion_id}": {
-            "get": {
-                "tags": [
-                    "router"
-                ],
-                "summary": "*[OpenAI Only]* Get a Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.",
-                "operationId": "getChatCompletion",
-                "parameters": [
-                    {
-                        "name": "completion_id",
-                        "in": "path",
-                        "description": "ID of the chat completion",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Chat completion gotten successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ChatCompletion"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "502": {
-                        "description": "Bad gateway error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            },
-            "post": {
-                "tags": [
-                    "router"
-                ],
-                "summary": "*[OpenAI Only]* Update a Chat Completion with some metadata. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.",
-                "operationId": "updateChatCompletion",
-                "parameters": [
-                    {
-                        "name": "completion_id",
-                        "in": "path",
-                        "description": "ID of the chat completion",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "description": "Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information about the object in a structured format, and querying for objects via API or the dashboard. Keys are strings with a maximum length of 64 characters. Values are strings with a maximum length of 512 characters.",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "metadata": {
-                                        "type": "object",
-                                        "additionalProperties": {
-                                            "type": "string"
-                                        },
-                                        "description": "The metadata key-value pairs to attach to the completion."
-                                    }
-                                },
-                                "required": ["metadata"],
-                                "additionalProperties": false
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Chat completion updated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ChatCompletion"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "502": {
-                        "description": "Bad gateway error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "router"
-                ],
-                "summary": "*[OpenAI Only]* Delete a stored Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.",
-                "operationId": "deleteChatCompletion",
-                "parameters": [
-                    {
-                        "name": "completion_id",
-                        "in": "path",
-                        "description": "ID of the chat completion",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Chat completion deleted successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ChatDeletionConfirmation"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "502": {
-                        "description": "Bad gateway error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            }
-        },
-        "/v1/chat/completions/{completion_id}/messages": {
-            "get": {
-                "tags": [
-                    "router"
-                ],
-                "summary": "*[OpenAI Only]* Get the array of messages for a saved Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned.",
-                "operationId": "getChatCompletionMessages",
-                "parameters": [
-                    {
-                        "name": "completion_id",
-                        "in": "path",
-                        "description": "ID of the chat completion",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "after",
-                        "in": "query",
-                        "description": "Identifier for the last message from the previous pagination request.",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Number of messages to retrieve.",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int32",
-                            "minimum": 0
-                        }
-                    },
-                    {
-                        "name": "order",
-                        "in": "query",
-                        "description": "Sort order for messages by timestamp. Use asc for ascending order or desc for descending order. Defaults to asc.",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Chat completion messages gotten successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ChatMessageList"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "502": {
-                        "description": "Bad gateway error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            }
-        },
-        "/v1/images/generations": {
-            "post": {
-                "tags": [
-                    "router"
-                ],
-                "summary": "Generate Image",
-                "operationId": "generateImage",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ImageGenerationRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Image generated successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ImageGeneration"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "502": {
-                        "description": "Bad gateway error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            }
-        },
-        "/v1/models": {
-            "get": {
-                "tags": [
-                    "system"
-                ],
-                "summary": "Get a list of all AI models supported in the Sudo API.",
-                "operationId": "getSupportedModels",
-                "responses": {
-                    "200": {
-                        "description": "Supported models retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SupportedModelsList"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "api_key": []
-                    }
-                ]
-            }
-        }
-    },
-    "components": {
-        "securitySchemes": {
-            "api_key": {
-                "type": "http",
-                "scheme": "bearer"
-            }
-        },
-        "schemas": {
-            "ChatCompletion": {
-                "type": "object",
-                "required": [
-                    "choices",
-                    "created",
-                    "id",
-                    "model",
-                    "object",
-                    "usage"
-                ],
-                "properties": {
-                    "choices": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Choice"
-                        }
-                    },
-                    "created": {
-                        "type": "integer",
-                        "format": "int64",
-                        "minimum": 0
-                    },
-                    "id": {
-                        "type": "string"
-                    },
-                    "model": {
-                        "type": "string"
-                    },
-                    "object": {
-                        "type": "string"
-                    },
-                    "service_tier": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "system_fingerprint": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "usage": {
-                        "$ref": "#/components/schemas/Usage"
-                    },
-                    "metadata": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "nullable": true,
-                        "description": "Developer-defined metadata attached to the completion."
-                    }
-                }
-            },
-            "ChatCompletionList": {
-                "type": "object",
-                "required": [
-                    "data",
-                    "first_id",
-                    "has_more",
-                    "last_id",
-                    "object"
-                ],
-                "properties": {
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ChatCompletion"
-                        }
-                    },
-                    "first_id": {
-                        "type": "string"
-                    },
-                    "has_more": {
-                        "type": "boolean"
-                    },
-                    "last_id": {
-                        "type": "string"
-                    },
-                    "object": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ChatCompletionRequestJson": {
-                "type": "object",
-                "required": [
-                    "messages",
-                    "model"
-                ],
-                "properties": {
-                    "audio": {
-                        "type": "object",
-                        "nullable": true,
-                        "description": "Parameters for audio output. Required when audio output is requested with modalities: [\"audio\"].",
-                        "properties": {
-                            "format": {
-                                "type": "string",
-                                "enum": ["wav", "mp3", "flac", "opus", "pcm16"],
-                                "description": "Specifies the output audio format. Must be one of wav, mp3, flac, opus, or pcm16."
-                            },
-                            "voice": {
-                                "type": "string", 
-                                "enum": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"],
-                                "description": "Specifies the voice type. Supported voices are alloy, echo, fable, onyx, nova, and shimmer."
-                            }
-                        }
-                    },
-                    "frequency_penalty": {
-                        "type": "number",
-                        "format": "float",
-                        "minimum": -2.0,
-                        "maximum": 2.0,
-                        "nullable": true,
-                        "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim."
-                    },
-                    "logit_bias": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
-                        },
-                        "nullable": true,
-                        "description": "Modify the likelihood of specified tokens appearing in the completion. Accepts a JSON object that maps tokens (specified by their token ID in the tokenizer) to an associated bias value from -100 to 100. Mathematically, the bias is added to the logits generated by the model prior to sampling. The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token."
-                    },
-                    "logprobs": {
-                        "type": "boolean",
-                        "nullable": true,
-                        "description": "Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of each output token returned in the content of message."
-                    },
-                    "max_completion_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "nullable": true,
-                        "description": "An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens."
-                    },
-                    "messages": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ChatMessage"
-                        },
-                        "description": "A list of messages comprising the conversation so far. Depending on the model you use, different message types (modalities) are supported, like text, images, and audio."
-                    },
-                    "metadata": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "nullable": true,
-                        "description": "Developer-defined tags and values used for filtering completions in the stored completions dashboard."
-                    },
-                    "modalities": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "enum": ["text", "audio"]
-                        },
-                        "nullable": true,
-                        "description": "Output types that you would like the model to generate for this request. Most models are capable of generating text, which is the default: [\"text\"]. The gpt-4o-audio-preview model can also be used to generate audio. To request that this model generate both text and audio responses, you can use: [\"text\", \"audio\"]."
-                    },
-                    "model": {
-                        "type": "string",
-                        "description": "Model name used to generate the response, like gpt-4o or deepseek-reasoner. Sudo offers a wide range of models with different capabilities, performance characteristics, and price points. Refer to the [docs](https://docs.sudoapp.dev/overview/models) to browse and compare available models."
-                    },
-                    "n": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "nullable": true,
-                        "description": "How many chat completion choices to generate for each input message. Note that you will be charged based on the number of generated tokens across all of the choices. Keep n as 1 to minimize costs."
-                    },
-                    "parallel_tool_calls": {
-                        "type": "boolean",
-                        "nullable": true,
-                        "description": "Whether to enable parallel function calling during tool use."
-                    },
-                    "prediction": {
-                        "type": "object",
-                        "nullable": true,
-                        "description": "Configuration for a Predicted Output, which can greatly improve response times when large parts of the model response are known ahead of time. This is most common when you are regenerating a file with only minor changes to most of the content.",
-                        "properties": {
-                            "type": {
-                                "type": "string",
-                                "enum": ["content"]
-                            },
-                            "content": {
-                                "type": "string",
-                                "description": "The predicted content for the completion."
-                            }
-                        }
-                    },
-                    "presence_penalty": {
-                        "type": "number",
-                        "format": "float",
-                        "minimum": -2.0,
-                        "maximum": 2.0,
-                        "nullable": true,
-                        "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics."
-                    },
-                    "prompt_cache_key": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "A unique identifier for caching prompts to improve response times for repeated requests."
-                    },
-                    "reasoning_effort": {
-                        "type": "string",
-                        "enum": ["low", "medium", "high"],
-                        "nullable": true,
-                        "description": "o1 models only. Constrains effort on reasoning for reasoning models. Currently supported values are low, medium, and high. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response."
-                    },
-                    "response_format": {
-                        "oneOf": [
-                            {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": ["text"]
-                                    }
-                                },
-                                "required": ["type"],
-                                "additionalProperties": false
-                            },
-                            {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": ["json_object"]
-                                    }
-                                },
-                                "required": ["type"],
-                                "additionalProperties": false
-                            },
-                            {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": ["json_schema"]
-                                    },
-                                    "json_schema": {
-                                        "type": "object",
-                                        "description": "The JSON schema definition for structured outputs.",
-                                        "properties": {
-                                            "name": {
-                                                "type": "string",
-                                                "description": "The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64."
-                                            },
-                                            "description": {
-                                                "type": "string",
-                                                "description": "A description of what the response format is for, used by the model to determine how to respond in the format."
-                                            },
-                                            "schema": {
-                                                "type": "object",
-                                                "description": "The schema for the response format, described as a JSON Schema object.",
-                                                "additionalProperties": true
-                                            },
-                                            "strict": {
-                                                "type": "boolean",
-                                                "description": "Whether to enable strict schema adherence when generating the output."
-                                            }
-                                        },
-                                        "required": ["name", "schema"],
-                                        "additionalProperties": false
-                                    }
-                                },
-                                "required": ["type", "json_schema"],
-                                "additionalProperties": false
-                            }
-                        ],
-                        "nullable": true,
-                        "description": "An object specifying the format that the model must output. Compatible with GPT-4o, GPT-4o mini, GPT-4 Turbo and all GPT-3.5 Turbo models newer than gpt-3.5-turbo-1106. Setting to { \"type\": \"json_schema\", \"json_schema\": {...} } enables Structured Outputs which guarantee the model will match your supplied JSON schema. Setting to { \"type\": \"json_object\" } enables JSON mode, which guarantees the message the model generates is valid JSON."
-                    },
-                    "seed": {
-                        "type": "integer",
-                        "format": "int32",
-                        "nullable": true,
-                        "description": "If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism isn't guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend."
-                    },
-                    "service_tier": {
-                        "type": "string",
-                        "enum": ["auto", "default"],
-                        "nullable": true,
-                        "description": "Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service."
-                    },
-                    "stop": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "nullable": true,
-                        "description": "Not supported with latest reasoning models o3 and o4-mini. Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence."
-                    },
-                    "store": {
-                        "type": "boolean",
-                        "nullable": true,
-                        "description": "Whether or not to store the output of this chat completion request for use in our model distillation or evaluation products."
-                    },
-                    "stream": {
-                        "type": "boolean",
-                        "enum": [false],
-                        "default": false,
-                        "description": "If set, partial message deltas will be sent, like in ChatGPT. For JSON responses, this must be false."
-                    },
-                    "stream_options": {
-                        "type": "object",
-                        "nullable": true,
-                        "description": "Options for streaming response. Only set this when you set stream: true.",
-                        "properties": {
-                            "include_usage": {
-                                "type": "boolean",
-                                "description": "If set, an additional chunk will be streamed before the data: [DONE] message. The usage field on this chunk shows the token usage statistics for the entire request, and the choices field will always be an empty array. All other chunks will also include a usage field, but with a null value."
-                            }
-                        }
-                    },
-                    "temperature": {
-                        "type": "number",
-                        "format": "float",
-                        "nullable": true,
-                        "description": "What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both."
-                    },
-                    "tool_choice": {
-                        "oneOf": [
-                            {
-                                "type": "string",
-                                "enum": ["none", "auto", "required"]
-                            },
-                            {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": ["function"]
-                                    },
-                                    "function": {
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": ["name"]
-                                    }
-                                },
-                                "required": ["type", "function"]
-                            }
-                        ],
-                        "nullable": true,
-                        "description": "Controls which (if any) tool is called by the model. none means the model won't call any tool and instead generates a message. auto means the model can pick between generating a message or calling one or more tools. required means the model must call one or more tools. Specifying a particular tool via {\"type\": \"function\", \"function\": {\"name\": \"my_function\"}} forces the model to call that tool. none is the default when no tools are present. auto is the default if tools are present."
-                    },
-                    "tools": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Tool"
-                        },
-                        "nullable": true,
-                        "description": "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for. A max of 128 functions are supported."
-                    },
-                    "top_logprobs": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "maximum": 20,
-                        "nullable": true,
-                        "description": "An integer between 0 and 20 specifying the number of most likely tokens to return at each token position, each with an associated log probability. logprobs must be set to true if this parameter is used."
-                    },
-                    "top_p": {
-                        "type": "number",
-                        "format": "float",
-                        "nullable": true,
-                        "description": "An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. We generally recommend altering this or temperature but not both."
-                    }
-                }
-            },
-            "ChatCompletionRequestStream": {
-                "type": "object",
-                "required": [
-                    "messages",
-                    "model"
-                ],
-                "properties": {
-                    "audio": {
-                        "type": "object",
-                        "nullable": true,
-                        "description": "Parameters for audio output. Required when audio output is requested with modalities: [\"audio\"].",
-                        "properties": {
-                            "format": {
-                                "type": "string",
-                                "enum": ["wav", "mp3", "flac", "opus", "pcm16"],
-                                "description": "Specifies the output audio format. Must be one of wav, mp3, flac, opus, or pcm16."
-                            },
-                            "voice": {
-                                "type": "string", 
-                                "enum": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"],
-                                "description": "Specifies the voice type. Supported voices are alloy, echo, fable, onyx, nova, and shimmer."
-                            }
-                        }
-                    },
-                    "frequency_penalty": {
-                        "type": "number",
-                        "format": "float",
-                        "minimum": -2.0,
-                        "maximum": 2.0,
-                        "nullable": true,
-                        "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim."
-                    },
-                    "logit_bias": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "number"
-                        },
-                        "nullable": true,
-                        "description": "Modify the likelihood of specified tokens appearing in the completion. Accepts a JSON object that maps tokens (specified by their token ID in the tokenizer) to an associated bias value from -100 to 100. Mathematically, the bias is added to the logits generated by the model prior to sampling. The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token."
-                    },
-                    "logprobs": {
-                        "type": "boolean",
-                        "nullable": true,
-                        "description": "Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of each output token returned in the content of message."
-                    },
-                    "max_completion_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "nullable": true,
-                        "description": "An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens."
-                    },
-                    "messages": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ChatMessage"
-                        },
-                        "description": "A list of messages comprising the conversation so far. Depending on the model you use, different message types (modalities) are supported, like text, images, and audio."
-                    },
-                    "metadata": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "type": "string"
-                        },
-                        "nullable": true,
-                        "description": "Developer-defined tags and values used for filtering completions in the stored completions dashboard."
-                    },
-                    "modalities": {
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "enum": ["text", "audio"]
-                        },
-                        "nullable": true,
-                        "description": "Output types that you would like the model to generate for this request. Most models are capable of generating text, which is the default: [\"text\"]. The gpt-4o-audio-preview model can also be used to generate audio. To request that this model generate both text and audio responses, you can use: [\"text\", \"audio\"]."
-                    },
-                    "model": {
-                        "type": "string",
-                        "description": "Model name used to generate the response, like gpt-4o or deepseek-reasoner. Sudo offers a wide range of models with different capabilities, performance characteristics, and price points. Refer to the [docs](https://docs.sudoapp.dev/overview/models) to browse and compare available models."
-                    },
-                    "n": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "nullable": true,
-                        "description": "How many chat completion choices to generate for each input message. Note that you will be charged based on the number of generated tokens across all of the choices. Keep n as 1 to minimize costs."
-                    },
-                    "parallel_tool_calls": {
-                        "type": "boolean",
-                        "nullable": true,
-                        "description": "Whether to enable parallel function calling during tool use."
-                    },
-                    "prediction": {
-                        "type": "object",
-                        "nullable": true,
-                        "description": "Configuration for a Predicted Output, which can greatly improve response times when large parts of the model response are known ahead of time. This is most common when you are regenerating a file with only minor changes to most of the content.",
-                        "properties": {
-                            "type": {
-                                "type": "string",
-                                "enum": ["content"]
-                            },
-                            "content": {
-                                "type": "string",
-                                "description": "The predicted content for the completion."
-                            }
-                        }
-                    },
-                    "presence_penalty": {
-                        "type": "number",
-                        "format": "float",
-                        "minimum": -2.0,
-                        "maximum": 2.0,
-                        "nullable": true,
-                        "description": "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics."
-                    },
-                    "prompt_cache_key": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "A unique identifier for caching prompts to improve response times for repeated requests."
-                    },
-                    "reasoning_effort": {
-                        "type": "string",
-                        "enum": ["low", "medium", "high"],
-                        "nullable": true,
-                        "description": "o1 models only. Constrains effort on reasoning for reasoning models. Currently supported values are low, medium, and high. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response."
-                    },
-                    "response_format": {
-                        "oneOf": [
-                            {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": ["text"]
-                                    }
-                                },
-                                "required": ["type"],
-                                "additionalProperties": false
-                            },
-                            {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": ["json_object"]
-                                    }
-                                },
-                                "required": ["type"],
-                                "additionalProperties": false
-                            },
-                            {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": ["json_schema"]
-                                    },
-                                    "json_schema": {
-                                        "type": "object",
-                                        "description": "The JSON schema definition for structured outputs.",
-                                        "properties": {
-                                            "name": {
-                                                "type": "string",
-                                                "description": "The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64."
-                                            },
-                                            "description": {
-                                                "type": "string",
-                                                "description": "A description of what the response format is for, used by the model to determine how to respond in the format."
-                                            },
-                                            "schema": {
-                                                "type": "object",
-                                                "description": "The schema for the response format, described as a JSON Schema object.",
-                                                "additionalProperties": true
-                                            },
-                                            "strict": {
-                                                "type": "boolean",
-                                                "description": "Whether to enable strict schema adherence when generating the output."
-                                            }
-                                        },
-                                        "required": ["name", "schema"],
-                                        "additionalProperties": false
-                                    }
-                                },
-                                "required": ["type", "json_schema"],
-                                "additionalProperties": false
-                            }
-                        ],
-                        "nullable": true,
-                        "description": "An object specifying the format that the model must output. Compatible with GPT-4o, GPT-4o mini, GPT-4 Turbo and all GPT-3.5 Turbo models newer than gpt-3.5-turbo-1106. Setting to { \"type\": \"json_schema\", \"json_schema\": {...} } enables Structured Outputs which guarantee the model will match your supplied JSON schema. Setting to { \"type\": \"json_object\" } enables JSON mode, which guarantees the message the model generates is valid JSON."
-                    },
-                    "seed": {
-                        "type": "integer",
-                        "format": "int32",
-                        "nullable": true,
-                        "description": "If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism isn't guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend."
-                    },
-                    "service_tier": {
-                        "type": "string",
-                        "enum": ["auto", "default"],
-                        "nullable": true,
-                        "description": "Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service."
-                    },
-                    "stop": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "nullable": true,
-                        "description": "Not supported with latest reasoning models o3 and o4-mini. Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence."
-                    },
-                    "store": {
-                        "type": "boolean",
-                        "nullable": true,
-                        "description": "Whether or not to store the output of this chat completion request for use in our model distillation or evaluation products."
-                    },
-                    "stream": {
-                        "type": "boolean",
-                        "enum": [true],
-                        "default": true,
-                        "description": "If set, partial message deltas will be sent as server-sent events. For streaming responses, this must be true."
-                    },
-                    "stream_options": {
-                        "type": "object",
-                        "nullable": true,
-                        "description": "Options for streaming response. Only set this when you set stream: true.",
-                        "properties": {
-                            "include_usage": {
-                                "type": "boolean",
-                                "description": "If set, an additional chunk will be streamed before the data: [DONE] message. The usage field on this chunk shows the token usage statistics for the entire request, and the choices field will always be an empty array. All other chunks will also include a usage field, but with a null value."
-                            }
-                        }
-                    },
-                    "temperature": {
-                        "type": "number",
-                        "format": "float",
-                        "nullable": true,
-                        "description": "What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both."
-                    },
-                    "tool_choice": {
-                        "oneOf": [
-                            {
-                                "type": "string",
-                                "enum": ["none", "auto", "required"]
-                            },
-                            {
-                                "type": "object",
-                                "properties": {
-                                    "type": {
-                                        "type": "string",
-                                        "enum": ["function"]
-                                    },
-                                    "function": {
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": ["name"]
-                                    }
-                                },
-                                "required": ["type", "function"]
-                            }
-                        ],
-                        "nullable": true,
-                        "description": "Controls which (if any) tool is called by the model. none means the model won't call any tool and instead generates a message. auto means the model can pick between generating a message or calling one or more tools. required means the model must call one or more tools. Specifying a particular tool via {\"type\": \"function\", \"function\": {\"name\": \"my_function\"}} forces the model to call that tool. none is the default when no tools are present. auto is the default if tools are present."
-                    },
-                    "tools": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Tool"
-                        },
-                        "nullable": true,
-                        "description": "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for. A max of 128 functions are supported."
-                    },
-                    "top_logprobs": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "maximum": 20,
-                        "nullable": true,
-                        "description": "An integer between 0 and 20 specifying the number of most likely tokens to return at each token position, each with an associated log probability. logprobs must be set to true if this parameter is used."
-                    },
-                    "top_p": {
-                        "type": "number",
-                        "format": "float",
-                        "nullable": true,
-                        "description": "An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. We generally recommend altering this or temperature but not both."
-                    },
-                    "user": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "A unique identifier representing your end-user, which can help to monitor and detect abuse."
-                    }
-                }
-            },
-            "ChatCompletionChunk": {
-                "type": "object",
-                "properties": {
-                    "data": {
-                        "type": "object",
-                        "required": [
-                            "id",
-                            "object",
-                            "created",
-                            "model",
-                            "choices"
-                        ],
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "description": "A unique identifier for the chat completion."
-                            },
-                            "object": {
-                                "type": "string",
-                                "enum": ["chat.completion.chunk"],
-                                "description": "The object type, which is always 'chat.completion.chunk'."
-                            },
-                            "created": {
-                                "type": "integer",
-                                "format": "int64",
-                                "description": "The Unix timestamp (in seconds) of when the chat completion was created."
-                            },
-                            "model": {
-                                "type": "string",
-                                "description": "The model used for the chat completion."
-                            },
-                            "system_fingerprint": {
-                                "type": "string",
-                                "nullable": true,
-                                "description": "This fingerprint represents the backend configuration that the model runs with."
-                            },
-                            "choices": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/ChatCompletionChunkChoice"
-                                },
-                                "description": "A list of chat completion choices."
-                            },
-                            "usage": {
-                                "$ref": "#/components/schemas/Usage",
-                                "nullable": true,
-                                "description": "Usage statistics for the completion request. Only present in the final chunk when stream_options.include_usage is set."
-                            }
-                        }
-                    }
-                }
-            },
-            "ChatCompletionChunkChoice": {
-                "type": "object",
-                "required": [
-                    "index",
-                    "delta"
-                ],
-                "properties": {
-                    "index": {
-                        "type": "integer",
-                        "format": "int32",
-                        "description": "The index of the choice in the list of choices."
-                    },
-                    "delta": {
-                        "$ref": "#/components/schemas/ChatCompletionDelta",
-                        "description": "A chat completion delta generated by streamed model responses."
-                    },
-                    "finish_reason": {
-                        "type": "string",
-                        "nullable": true,
-                        "enum": ["stop", "length", "tool_calls", "content_filter"],
-                        "description": "The reason the model stopped generating tokens. This will be 'stop' if the model hit a natural stop point or a provided stop sequence, 'length' if the maximum number of tokens specified in the request was reached, 'tool_calls' if the model called a tool, or 'content_filter' if content was omitted due to a flag from our content filters."
-                    },
-                    "logprobs": {
-                        "type": "object",
-                        "nullable": true,
-                        "description": "Log probability information for the choice."
-                    }
-                }
-            },
-            "ChatCompletionDelta": {
-                "type": "object",
-                "properties": {
-                    "content": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "The contents of the chunk message."
-                    },
-                    "role": {
-                        "type": "string",
-                        "nullable": true,
-                        "enum": ["assistant", "user", "system", "tool"],
-                        "description": "The role of the author of this message."
-                    },
-                    "tool_calls": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ToolCall"
-                        },
-                        "nullable": true,
-                        "description": "The tool calls generated by the model, such as function calls."
-                    },
-                    "refusal": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "The refusal message generated by the model."
-                    }
-                }
-            },
-            "ChatDeletionConfirmation": {
-                "type": "object",
-                "required": [
-                    "object",
-                    "id",
-                    "deleted"
-                ],
-                "properties": {
-                    "deleted": {
-                        "type": "boolean"
-                    },
-                    "id": {
-                        "type": "string"
-                    },
-                    "object": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ChatMessage": {
-                "type": "object",
-                "required": [
-                    "role",
-                    "content"
-                ],
-                "properties": {
-                    "content": {
-                        "$ref": "#/components/schemas/MessageContent"
-                    },
-                    "name": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "role": {
-                        "type": "string"
-                    },
-                    "tool_call_id": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "tool_calls": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ToolCall"
-                        },
-                        "nullable": true
-                    }
-                }
-            },
-            "ChatMessageList": {
-                "type": "object",
-                "required": [
-                    "object",
-                    "data",
-                    "first_id",
-                    "last_id",
-                    "has_more"
-                ],
-                "properties": {
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ReturnedChatMessages"
-                        }
-                    },
-                    "first_id": {
-                        "type": "string"
-                    },
-                    "has_more": {
-                        "type": "boolean"
-                    },
-                    "last_id": {
-                        "type": "string"
-                    },
-                    "object": {
-                        "type": "string"
-                    }
-                }
-            },
-            "Choice": {
-                "type": "object",
-                "required": [
-                    "finish_reason",
-                    "index",
-                    "message"
-                ],
-                "properties": {
-                    "finish_reason": {
-                        "type": "string"
-                    },
-                    "index": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "logprobs": {},
-                    "message": {
-                        "$ref": "#/components/schemas/MessageResponse"
-                    }
-                }
-            },
-            "ContentPart": {
-                "oneOf": [
-                    {
-                        "description": "Text content part.",
-                        "type": "object",
-                        "required": [
-                            "text",
-                            "type"
-                        ],
-                        "properties": {
-                            "text": {
-                                "type": "string"
-                            },
-                            "type": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    {
-                        "description": "Image content part.",
-                        "type": "object",
-                        "required": [
-                            "image_url",
-                            "type"
-                        ],
-                        "properties": {
-                            "image_url": {
-                                "type": "object",
-                                "required": [
-                                    "url"
-                                ],
-                                "properties": {
-                                    "url": {
-                                        "type": "string",
-                                        "description": "Either a URL of the image or the base64 encoded image data."
-                                    }, 
-                                    "detail": {
-                                        "type": "string",
-                                        "description": "Specifies the detail level of the image."
-                                    }
-                                }
-                            },
-                            "type": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    {
-                        "description": "Audio content part.",
-                        "type": "object",
-                        "required": [
-                            "input_audio",
-                            "type"
-                        ],
-                        "properties": {
-                            "input_audio": {
-                                "type": "object",
-                                "required": [
-                                    "data",
-                                    "format"
-                                ],
-                                "properties": {
-                                    "data": {
-                                        "type": "string",
-                                        "description": "Base64 encoded audio data."
-                                    },
-                                    "format": {
-                                        "type": "string",
-                                        "description": "The format of the encoded audio data. Currently supports wav and mp3."
-                                    }
-                                }
-                            },
-                            "type": {
-                                "type": "string",
-                                "description": "The type of the content part. Always input_audio."
-                            }
-                        }
-                    },
-                    {
-                        "description": "File content part.",
-                        "type": "object",
-                        "required": [
-                            "file",
-                            "type"
-                        ],
-                        "properties": {
-                            "file": {
-                                "type": "object",
-                                "properties": {
-                                    "file_data": {
-                                        "type": "string",
-                                        "description": "The base64 encoded file data, used when passing the file to the model as a string."
-                                    },
-                                    "file_id": {
-                                        "type": "string",
-                                        "description": "The ID of an uploaded file to use as input."
-                                    },
-                                    "file_name": {
-                                        "type": "string",
-                                        "description": "The name of the file, used when passing the file to the model as a string."
-                                    }
-                                }
-                            },
-                            "type": {
-                                "type": "string",
-                                "description": "The type of the content part. Always file."
-                            }
-                        }
-                    }
-                ]
-            },
-            "ErrorDetail": {
-                "type": "object",
-                "required": [
-                    "message",
-                    "type"
-                ],
-                "properties": {
-                    "message": {
-                        "type": "string"
-                    },
-                    "type": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ErrorResponse": {
-                "type": "object",
-                "required": [
-                    "error"
-                ],
-                "properties": {
-                    "error": {
-                        "$ref": "#/components/schemas/ErrorDetail"
-                    }
-                }
-            },
-            "File": {
-                "type": "object",
-                "properties": {
-                    "file_data": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "file_id": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "filename": {
-                        "type": "string",
-                        "nullable": true
-                    }
-                }
-            },
-            "Function": {
-                "type": "object",
-                "required": [
-                    "name"
-                ],
-                "properties": {
-                    "description": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "parameters": {},
-                    "strict": {
-                        "type": "boolean",
-                        "nullable": true
-                    }
-                }
-            },
-            "ImageUrl": {
-                "type": "object",
-                "required": [
-                    "url"
-                ],
-                "properties": {
-                    "detail": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "url": {
-                        "type": "string"
-                    }
-                }
-            },
-            "MessageContent": {
-                "oneOf": [
-                    {
-                        "type": "string",
-                        "description": "Simple text content"
-                    },
-                    {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ContentPart"
-                        },
-                        "description": "Array of content parts for multimodal input"
-                    }
-                ]
-            },
-            "MessageResponse": {
-                "type": "object",
-                "required": [
-                    "role"
-                ],
-                "properties": {
-                    "annotations": {},
-                    "audio": {},
-                    "content": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "refusal": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "role": {
-                        "type": "string"
-                    },
-                    "tool_calls": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ToolCall"
-                        },
-                        "nullable": true
-                    }
-                }
-            },
-            "ReturnedChatMessages": {
-                "type": "object",
-                "required": [
-                    "id",
-                    "role"
-                ],
-                "properties": {
-                    "content": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "content_parts": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ContentPart"
-                        },
-                        "nullable": true
-                    },
-                    "id": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "role": {
-                        "type": "string"
-                    }
-                }
-            },
-            "SupportedModel": {
-                "type": "object",
-                "required": [
-                    "created_at",
-                    "sudo_model_id",
-                    "model_name",
-                    "model_provider"
-                ],
-                "properties": {
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "model_name": {
-                        "type": "string"
-                    },
-                    "model_provider": {
-                        "type": "string"
-                    },
-                    "sudo_model_id": {
-                        "type": "integer",
-                        "format": "int32"
-                    }
-                }
-            },
-            "SupportedModelsList": {
-                "type": "object",
-                "required": [
-                    "data",
-                    "first_id",
-                    "has_more",
-                    "last_id"
-                ],
-                "properties": {
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/SupportedModel"
-                        }
-                    },
-                    "first_id": {
-                        "type": "string"
-                    },
-                    "has_more": {
-                        "type": "boolean"
-                    },
-                    "last_id": {
-                        "type": "string"
-                    }
-                }
-            },
-            "Tool": {
-                "type": "object",
-                "required": [
-                    "function",
-                    "type"
-                ],
-                "properties": {
-                    "function": {
-                        "$ref": "#/components/schemas/Function"
-                    },
-                    "type": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ToolCall": {
-                "type": "object",
-                "required": [
-                    "id",
-                    "type",
-                    "function"
-                ],
-                "properties": {
-                    "function": {
-                        "$ref": "#/components/schemas/ToolCallFunction"
-                    },
-                    "id": {
-                        "type": "string"
-                    },
-                    "type": {
-                        "type": "string"
-                    }
-                }
-            },
-            "ToolCallFunction": {
-                "type": "object",
-                "required": [
-                    "name",
-                    "arguments"
-                ],
-                "properties": {
-                    "arguments": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    }
-                }
-            },
-            "Usage": {
-                "type": "object",
-                "required": [
-                    "completion_tokens",
-                    "prompt_tokens",
-                    "total_tokens"
-                ],
-                "properties": {
-                    "completion_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "completion_tokens_details": {},
-                    "prompt_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    },
-                    "prompt_tokens_details": {},
-                    "total_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0
-                    }
-                }
-            },
-            "ImageGenerationRequest": {
-                "type": "object",
-                "required": [
-                    "prompt",
-                    "model"
-                ],
-                "properties": {
-                    "prompt": {
-                        "type": "string",
-                        "description": "A text description of the desired image(s). The maximum length is 1000 characters for dall-e-2 and 4000 characters for dall-e-3."
-                    },
-                    "model": {
-                        "type": "string",
-                        "description": "The model to use for image generation."
-                    },
-                    "n": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 1,
-                        "maximum": 10,
-                        "nullable": true,
-                        "description": "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported."
-                    },
-                    "response_format": {
-                        "type": "string",
-                        "enum": ["url", "b64_json"],
-                        "nullable": true,
-                        "description": "The format in which the generated images are returned. Must be one of url or b64_json. URLs are only valid for 60 minutes after the image has been generated."
-                    },
-                    "quality": {
-                        "type": "string",
-                        "enum": ["standard", "hd"],
-                        "nullable": true,
-                        "description": "The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image. This param is only supported for dall-e-3."
-                    },
-                    "size": {
-                        "type": "string",
-                        "enum": ["256x256", "512x512", "1024x1024", "1792x1024", "1024x1792"],
-                        "nullable": true,
-                        "description": "The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024 for dall-e-2. Must be one of 1024x1024, 1792x1024, or 1024x1792 for dall-e-3 models."
-                    },
-                    "style": {
-                        "type": "string",
-                        "enum": ["vivid", "natural"],
-                        "nullable": true,
-                        "description": "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This param is only supported for dall-e-3."
-                    },
-                    "background": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "OpenAI only: Specify the background removal for the generated image."
-                    },
-                    "moderation": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "OpenAI only: Content moderation settings for the image generation."
-                    },
-                    "output_compression": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "maximum": 100,
-                        "nullable": true,
-                        "description": "OpenAI only: Compression level for the output image, from 0 to 100."
-                    },
-                    "output_format": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "OpenAI only: The output format for the generated image."
-                    }
-                }
-            },
-            "ImageGeneration": {
-                "type": "object",
-                "required": [
-                    "data"
-                ],
-                "properties": {
-                    "background": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "Background settings used in generation (OpenAI only)"
-                    },
-                    "created": {
-                        "type": "integer",
-                        "format": "int64",
-                        "minimum": 0,
-                        "nullable": true,
-                        "description": "The Unix timestamp (in seconds) of when the image was created."
-                    },
-                    "output_format": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "The output format of the generated image (OpenAI only)"
-                    },
-                    "quality": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "The quality setting used for generation (OpenAI only)"
-                    },
-                    "size": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "The size of the generated image (OpenAI only)"
-                    },
-                    "usage": {
-                        "$ref": "#/components/schemas/ImageUsage",
-                        "nullable": true,
-                        "description": "Usage statistics for the image generation request (OpenAI only)"
-                    },
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ImageData"
-                        },
-                        "description": "The list of generated images."
-                    }
-                }
-            },
-            "ImageData": {
-                "type": "object",
-                "properties": {
-                    "b64_json": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "The base64-encoded JSON of the generated image, if response_format is b64_json."
-                    },
-                    "revised_prompt": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "The prompt that was used to generate the image, if there was any revision to the prompt."
-                    },
-                    "url": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "The URL of the generated image, if response_format is url (default)."
-                    }
-                }
-            },
-            "ImageUsage": {
-                "type": "object",
-                "required": [
-                    "input_tokens",
-                    "input_tokens_details",
-                    "output_tokens",
-                    "total_tokens"
-                ],
-                "properties": {
-                    "input_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "description": "Number of tokens in the input prompt."
-                    },
-                    "input_tokens_details": {
-                        "$ref": "#/components/schemas/ImageInputTokens",
-                        "description": "Breakdown of input tokens by type."
-                    },
-                    "output_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "description": "Number of tokens used for the generated image."
-                    },
-                    "total_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "description": "Total number of tokens used in the request (input + output)."
-                    }
-                }
-            },
-            "ImageInputTokens": {
-                "type": "object",
-                "required": [
-                    "image_tokens",
-                    "text_tokens"
-                ],
-                "properties": {
-                    "image_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "description": "Number of tokens used for image processing."
-                    },
-                    "text_tokens": {
-                        "type": "integer",
-                        "format": "int32",
-                        "minimum": 0,
-                        "description": "Number of tokens used for text processing."
-                    }
-                }
-            }
-        }
-    },
-    "security": [
-        {
-            "api_key": []
-        }
-    ],
-    "tags": [
-        {
-            "name": "Sudo API",
-            "description": "Sudo: An AI Monetization Platform"
-        }
-    ]
-}
+openapi: "3.0.3"
+info:
+  title: "sudo-api"
+  license: {}
+  version: "0.1.0"
+paths:
+  "/system/health":
+    get:
+      tags:
+        - "system"
+      summary: "Check if the Sudo API and backend infrastructure are health and ready to accept connections."
+      operationId: "healthCheck"
+      responses:
+        "200":
+          description: "Health check successful"
+          content:
+            "application/json":
+              schema: {}
+  "/v1/chat/completions":
+    get:
+      tags:
+        - "router"
+      summary: "*[OpenAI Only]* Get a list of saved Chat Completions. Only Chat Completions that have been stored with the `store` parameter set to true will be returned."
+      operationId: "listChatCompletions"
+      parameters:
+        - name: "after"
+          in: "query"
+          description: "Identifier for the last chat completion from the previous pagination request."
+          required: false
+          schema:
+            type: "string"
+        - name: "limit"
+          in: "query"
+          description: "Number of Chat Completions to retrieve."
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            minimum: 0
+        - name: "metadata"
+          in: "query"
+          description: "A list of metadata keys to filter the Chat Completions by. Example: metadata[key1]=value1&metadata[key2]=value2"
+          required: false
+          schema:
+            type: "object"
+            additionalProperties:
+              type: "string"
+        - name: "model"
+          in: "query"
+          description: "The model used to generate the Chat Completions."
+          required: false
+          schema:
+            type: "string"
+        - name: "order"
+          in: "query"
+          description: "Sort order for Chat Completions by timestamp. Use asc for ascending order or desc for descending order. Defaults to asc."
+          required: false
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Chat completions listed successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ChatCompletionList"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+    post:
+      tags:
+        - "router"
+      summary: "Create a model response for the given string of prompts."
+      operationId: "create"
+      requestBody:
+        content:
+          "application/json":
+            schema: {"$ref": "#/components/schemas/ChatCompletionRequestJson"}
+        required: true
+      responses:
+        "200":
+          description: "Chat completion created successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ChatCompletion"}
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+  "/v1/chat/completions#stream":
+    post:
+      tags:
+        - "router"
+      summary: "Create a streaming model response for the given string of prompts using server-sent events."
+      operationId: "createStreaming"
+      requestBody:
+        content:
+          "application/json":
+            schema: {"$ref": "#/components/schemas/ChatCompletionRequestStream"}
+        required: true
+      responses:
+        "200":
+          description: "Chat completion stream created successfully"
+          content:
+            "text/event-stream":
+              schema: {"$ref": "#/components/schemas/ChatCompletionChunk"}
+              x-speakeasy-sse-sentinel: "[DONE]"
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+  "/v1/chat/completions/{completion_id}":
+    get:
+      tags:
+        - "router"
+      summary: "*[OpenAI Only]* Get a Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned."
+      operationId: "getChatCompletion"
+      parameters:
+        - name: "completion_id"
+          in: "path"
+          description: "ID of the chat completion"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Chat completion gotten successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ChatCompletion"}
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+    post:
+      tags:
+        - "router"
+      summary: "*[OpenAI Only]* Update a Chat Completion with some metadata. Only Chat Completions that have been stored with the `store` parameter set to true will be returned."
+      operationId: "updateChatCompletion"
+      parameters:
+        - name: "completion_id"
+          in: "path"
+          description: "ID of the chat completion"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        description: "Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information about the object in a structured format, and querying for objects via API or the dashboard. Keys are strings with a maximum length of 64 characters. Values are strings with a maximum length of 512 characters."
+        content:
+          "application/json":
+            schema:
+              type: "object"
+              properties:
+                "metadata":
+                  type: "object"
+                  additionalProperties:
+                    type: "string"
+                  description: "The metadata key-value pairs to attach to the completion."
+              required:
+                - "metadata"
+              additionalProperties: false
+        required: true
+      responses:
+        "200":
+          description: "Chat completion updated successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ChatCompletion"}
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+    delete:
+      tags:
+        - "router"
+      summary: "*[OpenAI Only]* Delete a stored Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned."
+      operationId: "deleteChatCompletion"
+      parameters:
+        - name: "completion_id"
+          in: "path"
+          description: "ID of the chat completion"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Chat completion deleted successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ChatDeletionConfirmation"}
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+  "/v1/chat/completions/{completion_id}/messages":
+    get:
+      tags:
+        - "router"
+      summary: "*[OpenAI Only]* Get the array of messages for a saved Chat Completion. Only Chat Completions that have been stored with the `store` parameter set to true will be returned."
+      operationId: "getChatCompletionMessages"
+      parameters:
+        - name: "completion_id"
+          in: "path"
+          description: "ID of the chat completion"
+          required: true
+          schema:
+            type: "string"
+        - name: "after"
+          in: "query"
+          description: "Identifier for the last message from the previous pagination request."
+          required: false
+          schema:
+            type: "string"
+        - name: "limit"
+          in: "query"
+          description: "Number of messages to retrieve."
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            minimum: 0
+        - name: "order"
+          in: "query"
+          description: "Sort order for messages by timestamp. Use asc for ascending order or desc for descending order. Defaults to asc."
+          required: false
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "Chat completion messages gotten successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ChatMessageList"}
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+  "/v1/images/generations":
+    post:
+      tags:
+        - "router"
+      summary: "Generate Image"
+      operationId: "generateImage"
+      requestBody:
+        content:
+          "application/json":
+            schema: {"$ref": "#/components/schemas/ImageGenerationRequest"}
+        required: true
+      responses:
+        "200":
+          description: "Image generated successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ImageGeneration"}
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+  "/v1/models":
+    get:
+      tags:
+        - "system"
+      summary: "Get a list of all AI models supported in the Sudo API."
+      operationId: "getSupportedModels"
+      responses:
+        "200":
+          description: "Supported models retrieved successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/SupportedModelsList"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+  "/v1/responses":
+    post:
+      tags:
+        - "responses"
+      summary: "*[OpenAI Only]* Responses API: Create a model response for the given input"
+      operationId: "createResponse"
+      requestBody:
+        content:
+          "application/json":
+            schema: {"$ref": "#/components/schemas/ResponsesRequest"}
+        required: true
+      responses:
+        "200":
+          description: "Response created successfully"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/Response"}
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+  "/v1/responses#stream":
+    post:
+      tags:
+        - "responses"
+      summary: "*[OpenAI Only]* Responses API: Create a streaming model response for the given input using server-sent events."
+      operationId: "createStreamingResponse"
+      requestBody:
+        content:
+          "application/json":
+            schema: {"$ref": "#/components/schemas/ResponsesRequestStream"}
+        required: true
+      responses:
+        "200":
+          description: "Response stream created successfully"
+          content:
+            "text/event-stream":
+              schema: {"$ref": "#/components/schemas/ResponseEvent"}
+              x-speakeasy-sse-sentinel: "[DONE]"
+        "400":
+          description: "Bad request"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "401":
+          description: "Unauthorized"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "500":
+          description: "Internal server error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+        "502":
+          description: "Bad gateway error"
+          content:
+            "application/json":
+              schema: {"$ref": "#/components/schemas/ErrorResponse"}
+      security:
+        - api_key: []
+components:
+  securitySchemes:
+    "api_key":
+      type: "http"
+      scheme: "bearer"
+  schemas:
+    "ChatCompletion":
+      type: "object"
+      required:
+        - "choices"
+        - "created"
+        - "id"
+        - "model"
+        - "object"
+        - "usage"
+      properties:
+        "choices":
+          type: "array"
+          items: {"$ref": "#/components/schemas/Choice"}
+        "created":
+          type: "integer"
+          format: "int64"
+          minimum: 0
+        "id":
+          type: "string"
+        "model":
+          type: "string"
+        "object":
+          type: "string"
+        "service_tier":
+          type: "string"
+          nullable: true
+        "system_fingerprint":
+          type: "string"
+          nullable: true
+        "usage": {"$ref": "#/components/schemas/Usage"}
+        "metadata":
+          type: "object"
+          additionalProperties:
+            type: "string"
+          nullable: true
+          description: "Developer-defined metadata attached to the completion."
+    "ChatCompletionList":
+      type: "object"
+      required:
+        - "data"
+        - "first_id"
+        - "has_more"
+        - "last_id"
+        - "object"
+      properties:
+        "data":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ChatCompletion"}
+        "first_id":
+          type: "string"
+        "has_more":
+          type: "boolean"
+        "last_id":
+          type: "string"
+        "object":
+          type: "string"
+    "ChatCompletionRequestJson":
+      type: "object"
+      required:
+        - "messages"
+        - "model"
+      properties:
+        "audio":
+          type: "object"
+          nullable: true
+          description: "Parameters for audio output. Required when audio output is requested with modalities: [\"audio\"]."
+          properties:
+            "format":
+              type: "string"
+              enum:
+                - "wav"
+                - "mp3"
+                - "flac"
+                - "opus"
+                - "pcm16"
+              description: "Specifies the output audio format. Must be one of wav, mp3, flac, opus, or pcm16."
+            "voice":
+              type: "string"
+              enum:
+                - "alloy"
+                - "echo"
+                - "fable"
+                - "onyx"
+                - "nova"
+                - "shimmer"
+              description: "Specifies the voice type. Supported voices are alloy, echo, fable, onyx, nova, and shimmer."
+        "frequency_penalty":
+          type: "number"
+          format: "float"
+          minimum: -2
+          maximum: 2
+          nullable: true
+          description: "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim."
+        "logit_bias":
+          type: "object"
+          additionalProperties:
+            type: "number"
+          nullable: true
+          description: "Modify the likelihood of specified tokens appearing in the completion. Accepts a JSON object that maps tokens (specified by their token ID in the tokenizer) to an associated bias value from -100 to 100. Mathematically, the bias is added to the logits generated by the model prior to sampling. The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token."
+        "logprobs":
+          type: "boolean"
+          nullable: true
+          description: "Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of each output token returned in the content of message."
+        "max_completion_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+          description: "An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens."
+        "messages":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ChatMessage"}
+          description: "A list of messages comprising the conversation so far. Depending on the model you use, different message types (modalities) are supported, like text, images, and audio."
+        "metadata":
+          type: "object"
+          additionalProperties:
+            type: "string"
+          nullable: true
+          description: "Developer-defined tags and values used for filtering completions in the stored completions dashboard."
+        "modalities":
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "text"
+              - "audio"
+          nullable: true
+          description: "Output types that you would like the model to generate for this request. Most models are capable of generating text, which is the default: [\"text\"]. The gpt-4o-audio-preview model can also be used to generate audio. To request that this model generate both text and audio responses, you can use: [\"text\", \"audio\"]."
+        "model":
+          type: "string"
+          description: "Model name used to generate the response, like gpt-4o or deepseek-reasoner. Sudo offers a wide range of models with different capabilities, performance characteristics, and price points. Refer to the [docs](https://docs.sudoapp.dev/overview/models) to browse and compare available models."
+        "n":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+          description: "How many chat completion choices to generate for each input message. Note that you will be charged based on the number of generated tokens across all of the choices. Keep n as 1 to minimize costs."
+        "parallel_tool_calls":
+          type: "boolean"
+          nullable: true
+          description: "Whether to enable parallel function calling during tool use."
+        "prediction":
+          type: "object"
+          nullable: true
+          description: "Configuration for a Predicted Output, which can greatly improve response times when large parts of the model response are known ahead of time. This is most common when you are regenerating a file with only minor changes to most of the content."
+          properties:
+            "type":
+              type: "string"
+              enum:
+                - "content"
+            "content":
+              type: "string"
+              description: "The predicted content for the completion."
+        "presence_penalty":
+          type: "number"
+          format: "float"
+          minimum: -2
+          maximum: 2
+          nullable: true
+          description: "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics."
+        "prompt_cache_key":
+          type: "string"
+          nullable: true
+          description: "A unique identifier for caching prompts to improve response times for repeated requests."
+        "reasoning_effort":
+          type: "string"
+          enum:
+            - "low"
+            - "medium"
+            - "high"
+          nullable: true
+          description: "o1 models only. Constrains effort on reasoning for reasoning models. Currently supported values are low, medium, and high. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response."
+        "response_format":
+          oneOf:
+            - type: "object"
+              properties:
+                "type":
+                  type: "string"
+                  enum:
+                    - "text"
+              required:
+                - "type"
+              additionalProperties: false
+            - type: "object"
+              properties:
+                "type":
+                  type: "string"
+                  enum:
+                    - "json_object"
+              required:
+                - "type"
+              additionalProperties: false
+            - type: "object"
+              properties:
+                "type":
+                  type: "string"
+                  enum:
+                    - "json_schema"
+                "json_schema":
+                  type: "object"
+                  description: "The JSON schema definition for structured outputs."
+                  properties:
+                    "name":
+                      type: "string"
+                      description: "The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64."
+                    "description":
+                      type: "string"
+                      description: "A description of what the response format is for, used by the model to determine how to respond in the format."
+                    "schema":
+                      type: "object"
+                      description: "The schema for the response format, described as a JSON Schema object."
+                      additionalProperties: true
+                    "strict":
+                      type: "boolean"
+                      description: "Whether to enable strict schema adherence when generating the output."
+                  required:
+                    - "name"
+                    - "schema"
+                  additionalProperties: false
+              required:
+                - "type"
+                - "json_schema"
+              additionalProperties: false
+          nullable: true
+          description: "An object specifying the format that the model must output. Compatible with GPT-4o, GPT-4o mini, GPT-4 Turbo and all GPT-3.5 Turbo models newer than gpt-3.5-turbo-1106. Setting to { \"type\": \"json_schema\", \"json_schema\": {...} } enables Structured Outputs which guarantee the model will match your supplied JSON schema. Setting to { \"type\": \"json_object\" } enables JSON mode, which guarantees the message the model generates is valid JSON."
+        "seed":
+          type: "integer"
+          format: "int32"
+          nullable: true
+          description: "If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism isn't guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend."
+        "service_tier":
+          type: "string"
+          enum:
+            - "auto"
+            - "default"
+          nullable: true
+          description: "Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service."
+        "stop":
+          type: "array"
+          items:
+            type: "string"
+          nullable: true
+          description: "Not supported with latest reasoning models o3 and o4-mini. Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence."
+        "store":
+          type: "boolean"
+          nullable: true
+          description: "Whether or not to store the output of this chat completion request for use in our model distillation or evaluation products."
+        "stream":
+          type: "boolean"
+          enum:
+            - false
+          default: false
+          description: "If set, partial message deltas will be sent, like in ChatGPT. For JSON responses, this must be false."
+        "stream_options":
+          type: "object"
+          nullable: true
+          description: "Options for streaming response. Only set this when you set stream: true."
+          properties:
+            "include_usage":
+              type: "boolean"
+              description: "If set, an additional chunk will be streamed before the data: [DONE] message. The usage field on this chunk shows the token usage statistics for the entire request, and the choices field will always be an empty array. All other chunks will also include a usage field, but with a null value."
+        "temperature":
+          type: "number"
+          format: "float"
+          nullable: true
+          description: "What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both."
+        "tool_choice":
+          oneOf:
+            - type: "string"
+              enum:
+                - "none"
+                - "auto"
+                - "required"
+            - type: "object"
+              properties:
+                "type":
+                  type: "string"
+                  enum:
+                    - "function"
+                "function":
+                  type: "object"
+                  properties:
+                    "name":
+                      type: "string"
+                  required:
+                    - "name"
+              required:
+                - "type"
+                - "function"
+          nullable: true
+          description: "Controls which (if any) tool is called by the model. none means the model won't call any tool and instead generates a message. auto means the model can pick between generating a message or calling one or more tools. required means the model must call one or more tools. Specifying a particular tool via {\"type\": \"function\", \"function\": {\"name\": \"my_function\"}} forces the model to call that tool. none is the default when no tools are present. auto is the default if tools are present."
+        "tools":
+          type: "array"
+          items: {"$ref": "#/components/schemas/Tool"}
+          nullable: true
+          description: "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for. A max of 128 functions are supported."
+        "top_logprobs":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          maximum: 20
+          nullable: true
+          description: "An integer between 0 and 20 specifying the number of most likely tokens to return at each token position, each with an associated log probability. logprobs must be set to true if this parameter is used."
+        "top_p":
+          type: "number"
+          format: "float"
+          nullable: true
+          description: "An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. We generally recommend altering this or temperature but not both."
+    "ChatCompletionRequestStream":
+      type: "object"
+      required:
+        - "messages"
+        - "model"
+      properties:
+        "audio":
+          type: "object"
+          nullable: true
+          description: "Parameters for audio output. Required when audio output is requested with modalities: [\"audio\"]."
+          properties:
+            "format":
+              type: "string"
+              enum:
+                - "wav"
+                - "mp3"
+                - "flac"
+                - "opus"
+                - "pcm16"
+              description: "Specifies the output audio format. Must be one of wav, mp3, flac, opus, or pcm16."
+            "voice":
+              type: "string"
+              enum:
+                - "alloy"
+                - "echo"
+                - "fable"
+                - "onyx"
+                - "nova"
+                - "shimmer"
+              description: "Specifies the voice type. Supported voices are alloy, echo, fable, onyx, nova, and shimmer."
+        "frequency_penalty":
+          type: "number"
+          format: "float"
+          minimum: -2
+          maximum: 2
+          nullable: true
+          description: "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim."
+        "logit_bias":
+          type: "object"
+          additionalProperties:
+            type: "number"
+          nullable: true
+          description: "Modify the likelihood of specified tokens appearing in the completion. Accepts a JSON object that maps tokens (specified by their token ID in the tokenizer) to an associated bias value from -100 to 100. Mathematically, the bias is added to the logits generated by the model prior to sampling. The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token."
+        "logprobs":
+          type: "boolean"
+          nullable: true
+          description: "Whether to return log probabilities of the output tokens or not. If true, returns the log probabilities of each output token returned in the content of message."
+        "max_completion_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+          description: "An upper bound for the number of tokens that can be generated for a completion, including visible output tokens and reasoning tokens."
+        "messages":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ChatMessage"}
+          description: "A list of messages comprising the conversation so far. Depending on the model you use, different message types (modalities) are supported, like text, images, and audio."
+        "metadata":
+          type: "object"
+          additionalProperties:
+            type: "string"
+          nullable: true
+          description: "Developer-defined tags and values used for filtering completions in the stored completions dashboard."
+        "modalities":
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "text"
+              - "audio"
+          nullable: true
+          description: "Output types that you would like the model to generate for this request. Most models are capable of generating text, which is the default: [\"text\"]. The gpt-4o-audio-preview model can also be used to generate audio. To request that this model generate both text and audio responses, you can use: [\"text\", \"audio\"]."
+        "model":
+          type: "string"
+          description: "Model name used to generate the response, like gpt-4o or deepseek-reasoner. Sudo offers a wide range of models with different capabilities, performance characteristics, and price points. Refer to the [docs](https://docs.sudoapp.dev/overview/models) to browse and compare available models."
+        "n":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+          description: "How many chat completion choices to generate for each input message. Note that you will be charged based on the number of generated tokens across all of the choices. Keep n as 1 to minimize costs."
+        "parallel_tool_calls":
+          type: "boolean"
+          nullable: true
+          description: "Whether to enable parallel function calling during tool use."
+        "prediction":
+          type: "object"
+          nullable: true
+          description: "Configuration for a Predicted Output, which can greatly improve response times when large parts of the model response are known ahead of time. This is most common when you are regenerating a file with only minor changes to most of the content."
+          properties:
+            "type":
+              type: "string"
+              enum:
+                - "content"
+            "content":
+              type: "string"
+              description: "The predicted content for the completion."
+        "presence_penalty":
+          type: "number"
+          format: "float"
+          minimum: -2
+          maximum: 2
+          nullable: true
+          description: "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics."
+        "prompt_cache_key":
+          type: "string"
+          nullable: true
+          description: "A unique identifier for caching prompts to improve response times for repeated requests."
+        "reasoning_effort":
+          type: "string"
+          enum:
+            - "low"
+            - "medium"
+            - "high"
+          nullable: true
+          description: "o1 models only. Constrains effort on reasoning for reasoning models. Currently supported values are low, medium, and high. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response."
+        "response_format":
+          oneOf:
+            - type: "object"
+              properties:
+                "type":
+                  type: "string"
+                  enum:
+                    - "text"
+              required:
+                - "type"
+              additionalProperties: false
+            - type: "object"
+              properties:
+                "type":
+                  type: "string"
+                  enum:
+                    - "json_object"
+              required:
+                - "type"
+              additionalProperties: false
+            - type: "object"
+              properties:
+                "type":
+                  type: "string"
+                  enum:
+                    - "json_schema"
+                "json_schema":
+                  type: "object"
+                  description: "The JSON schema definition for structured outputs."
+                  properties:
+                    "name":
+                      type: "string"
+                      description: "The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64."
+                    "description":
+                      type: "string"
+                      description: "A description of what the response format is for, used by the model to determine how to respond in the format."
+                    "schema":
+                      type: "object"
+                      description: "The schema for the response format, described as a JSON Schema object."
+                      additionalProperties: true
+                    "strict":
+                      type: "boolean"
+                      description: "Whether to enable strict schema adherence when generating the output."
+                  required:
+                    - "name"
+                    - "schema"
+                  additionalProperties: false
+              required:
+                - "type"
+                - "json_schema"
+              additionalProperties: false
+          nullable: true
+          description: "An object specifying the format that the model must output. Compatible with GPT-4o, GPT-4o mini, GPT-4 Turbo and all GPT-3.5 Turbo models newer than gpt-3.5-turbo-1106. Setting to { \"type\": \"json_schema\", \"json_schema\": {...} } enables Structured Outputs which guarantee the model will match your supplied JSON schema. Setting to { \"type\": \"json_object\" } enables JSON mode, which guarantees the message the model generates is valid JSON."
+        "seed":
+          type: "integer"
+          format: "int32"
+          nullable: true
+          description: "If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism isn't guaranteed, and you should refer to the system_fingerprint response parameter to monitor changes in the backend."
+        "service_tier":
+          type: "string"
+          enum:
+            - "auto"
+            - "default"
+          nullable: true
+          description: "Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service."
+        "stop":
+          type: "array"
+          items:
+            type: "string"
+          nullable: true
+          description: "Not supported with latest reasoning models o3 and o4-mini. Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence."
+        "store":
+          type: "boolean"
+          nullable: true
+          description: "Whether or not to store the output of this chat completion request for use in our model distillation or evaluation products."
+        "stream":
+          type: "boolean"
+          enum:
+            - true
+          default: true
+          description: "If set, partial message deltas will be sent as server-sent events. For streaming responses, this must be true."
+        "stream_options":
+          type: "object"
+          nullable: true
+          description: "Options for streaming response. Only set this when you set stream: true."
+          properties:
+            "include_usage":
+              type: "boolean"
+              description: "If set, an additional chunk will be streamed before the data: [DONE] message. The usage field on this chunk shows the token usage statistics for the entire request, and the choices field will always be an empty array. All other chunks will also include a usage field, but with a null value."
+        "temperature":
+          type: "number"
+          format: "float"
+          nullable: true
+          description: "What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both."
+        "tool_choice":
+          oneOf:
+            - type: "string"
+              enum:
+                - "none"
+                - "auto"
+                - "required"
+            - type: "object"
+              properties:
+                "type":
+                  type: "string"
+                  enum:
+                    - "function"
+                "function":
+                  type: "object"
+                  properties:
+                    "name":
+                      type: "string"
+                  required:
+                    - "name"
+              required:
+                - "type"
+                - "function"
+          nullable: true
+          description: "Controls which (if any) tool is called by the model. none means the model won't call any tool and instead generates a message. auto means the model can pick between generating a message or calling one or more tools. required means the model must call one or more tools. Specifying a particular tool via {\"type\": \"function\", \"function\": {\"name\": \"my_function\"}} forces the model to call that tool. none is the default when no tools are present. auto is the default if tools are present."
+        "tools":
+          type: "array"
+          items: {"$ref": "#/components/schemas/Tool"}
+          nullable: true
+          description: "A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for. A max of 128 functions are supported."
+        "top_logprobs":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          maximum: 20
+          nullable: true
+          description: "An integer between 0 and 20 specifying the number of most likely tokens to return at each token position, each with an associated log probability. logprobs must be set to true if this parameter is used."
+        "top_p":
+          type: "number"
+          format: "float"
+          nullable: true
+          description: "An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. We generally recommend altering this or temperature but not both."
+        "user":
+          type: "string"
+          nullable: true
+          description: "A unique identifier representing your end-user, which can help to monitor and detect abuse."
+    "ChatCompletionChunk":
+      type: "object"
+      properties:
+        "data":
+          type: "object"
+          required:
+            - "id"
+            - "object"
+            - "created"
+            - "model"
+            - "choices"
+          properties:
+            "id":
+              type: "string"
+              description: "A unique identifier for the chat completion."
+            "object":
+              type: "string"
+              enum:
+                - "chat.completion.chunk"
+              description: "The object type, which is always 'chat.completion.chunk'."
+            "created":
+              type: "integer"
+              format: "int64"
+              description: "The Unix timestamp (in seconds) of when the chat completion was created."
+            "model":
+              type: "string"
+              description: "The model used for the chat completion."
+            "system_fingerprint":
+              type: "string"
+              nullable: true
+              description: "This fingerprint represents the backend configuration that the model runs with."
+            "choices":
+              type: "array"
+              items: {"$ref": "#/components/schemas/ChatCompletionChunkChoice"}
+              description: "A list of chat completion choices."
+            "usage":
+              allOf:
+                - {"$ref": "#/components/schemas/Usage"}
+              nullable: true
+              description: "Usage statistics for the completion request. When stream_options.include_usage is set, the final chunk before [DONE] will contain the full usage statistics, and all other chunks will include usage with a null value."
+    "ChatCompletionChunkChoice":
+      type: "object"
+      required:
+        - "index"
+        - "delta"
+      properties:
+        "index":
+          type: "integer"
+          format: "int32"
+          description: "The index of the choice in the list of choices."
+        "delta": {"$ref": "#/components/schemas/ChatCompletionDelta", "description": "A chat completion delta generated by streamed model responses."}
+        "finish_reason":
+          type: "string"
+          nullable: true
+          enum:
+            - "stop"
+            - "length"
+            - "tool_calls"
+            - "content_filter"
+          description: "The reason the model stopped generating tokens. This will be 'stop' if the model hit a natural stop point or a provided stop sequence, 'length' if the maximum number of tokens specified in the request was reached, 'tool_calls' if the model called a tool, or 'content_filter' if content was omitted due to a flag from our content filters."
+        "logprobs":
+          type: "object"
+          nullable: true
+          description: "Log probability information for the choice."
+    "ChatCompletionDelta":
+      type: "object"
+      properties:
+        "content":
+          type: "string"
+          nullable: true
+          description: "The contents of the chunk message."
+        "role":
+          type: "string"
+          nullable: true
+          enum:
+            - "assistant"
+            - "user"
+            - "system"
+            - "tool"
+          description: "The role of the author of this message."
+        "tool_calls":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ToolCall"}
+          nullable: true
+          description: "The tool calls generated by the model, such as function calls."
+        "refusal":
+          type: "string"
+          nullable: true
+          description: "The refusal message generated by the model."
+    "ChatDeletionConfirmation":
+      type: "object"
+      required:
+        - "object"
+        - "id"
+        - "deleted"
+      properties:
+        "deleted":
+          type: "boolean"
+        "id":
+          type: "string"
+        "object":
+          type: "string"
+    "ChatMessage":
+      type: "object"
+      required:
+        - "role"
+        - "content"
+      properties:
+        "content": {"$ref": "#/components/schemas/MessageContent"}
+        "name":
+          type: "string"
+          nullable: true
+        "role":
+          type: "string"
+        "tool_call_id":
+          type: "string"
+          nullable: true
+        "tool_calls":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ToolCall"}
+          nullable: true
+    "ChatMessageList":
+      type: "object"
+      required:
+        - "object"
+        - "data"
+        - "first_id"
+        - "last_id"
+        - "has_more"
+      properties:
+        "data":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ReturnedChatMessages"}
+        "first_id":
+          type: "string"
+        "has_more":
+          type: "boolean"
+        "last_id":
+          type: "string"
+        "object":
+          type: "string"
+    "Choice":
+      type: "object"
+      required:
+        - "finish_reason"
+        - "index"
+        - "message"
+      properties:
+        "finish_reason":
+          type: "string"
+        "index":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+        "logprobs": {}
+        "message": {"$ref": "#/components/schemas/MessageResponse"}
+    "ContentPart":
+      oneOf:
+        - description: "Text content part."
+          type: "object"
+          required:
+            - "text"
+            - "type"
+          properties:
+            "text":
+              type: "string"
+            "type":
+              type: "string"
+        - description: "Image content part."
+          type: "object"
+          required:
+            - "image_url"
+            - "type"
+          properties:
+            "image_url":
+              type: "object"
+              required:
+                - "url"
+              properties:
+                "url":
+                  type: "string"
+                  description: "Either a URL of the image or the base64 encoded image data."
+                "detail":
+                  type: "string"
+                  description: "Specifies the detail level of the image."
+            "type":
+              type: "string"
+        - description: "Audio content part."
+          type: "object"
+          required:
+            - "input_audio"
+            - "type"
+          properties:
+            "input_audio":
+              type: "object"
+              required:
+                - "data"
+                - "format"
+              properties:
+                "data":
+                  type: "string"
+                  description: "Base64 encoded audio data."
+                "format":
+                  type: "string"
+                  description: "The format of the encoded audio data. Currently supports wav and mp3."
+            "type":
+              type: "string"
+              description: "The type of the content part. Always input_audio."
+        - description: "File content part."
+          type: "object"
+          required:
+            - "file"
+            - "type"
+          properties:
+            "file":
+              type: "object"
+              properties:
+                "file_data":
+                  type: "string"
+                  description: "The base64 encoded file data, used when passing the file to the model as a string."
+                "file_id":
+                  type: "string"
+                  description: "The ID of an uploaded file to use as input."
+                "file_name":
+                  type: "string"
+                  description: "The name of the file, used when passing the file to the model as a string."
+            "type":
+              type: "string"
+              description: "The type of the content part. Always file."
+    "ErrorDetail":
+      type: "object"
+      required:
+        - "message"
+        - "type"
+      properties:
+        "message":
+          type: "string"
+        "type":
+          type: "string"
+    "ErrorResponse":
+      type: "object"
+      required:
+        - "error"
+      properties:
+        "error": {"$ref": "#/components/schemas/ErrorDetail"}
+    "File":
+      type: "object"
+      properties:
+        "file_data":
+          type: "string"
+          nullable: true
+        "file_id":
+          type: "string"
+          nullable: true
+        "filename":
+          type: "string"
+          nullable: true
+    "Function":
+      type: "object"
+      required:
+        - "name"
+      properties:
+        "description":
+          type: "string"
+          nullable: true
+        "name":
+          type: "string"
+        "parameters": {}
+        "strict":
+          type: "boolean"
+          nullable: true
+    "ImageUrl":
+      type: "object"
+      required:
+        - "url"
+      properties:
+        "detail":
+          type: "string"
+          nullable: true
+        "url":
+          type: "string"
+    "MessageContent":
+      oneOf:
+        - type: "string"
+          description: "Simple text content"
+        - type: "array"
+          items: {"$ref": "#/components/schemas/ContentPart"}
+          description: "Array of content parts for multimodal input"
+    "MessageResponse":
+      type: "object"
+      required:
+        - "role"
+      properties:
+        "annotations": {}
+        "audio": {}
+        "content":
+          type: "string"
+          nullable: true
+        "refusal":
+          type: "string"
+          nullable: true
+        "role":
+          type: "string"
+        "tool_calls":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ToolCall"}
+          nullable: true
+    "ReturnedChatMessages":
+      type: "object"
+      required:
+        - "id"
+        - "role"
+      properties:
+        "content":
+          type: "string"
+          nullable: true
+        "content_parts":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ContentPart"}
+          nullable: true
+        "id":
+          type: "string"
+        "name":
+          type: "string"
+          nullable: true
+        "role":
+          type: "string"
+    "SupportedModel":
+      type: "object"
+      required:
+        - "created_at"
+        - "sudo_model_id"
+        - "model_name"
+        - "model_provider"
+      properties:
+        "created_at":
+          type: "string"
+          format: "date-time"
+        "model_name":
+          type: "string"
+        "model_provider":
+          type: "string"
+        "sudo_model_id":
+          type: "integer"
+          format: "int32"
+    "SupportedModelsList":
+      type: "object"
+      required:
+        - "data"
+        - "first_id"
+        - "has_more"
+        - "last_id"
+      properties:
+        "data":
+          type: "array"
+          items: {"$ref": "#/components/schemas/SupportedModel"}
+        "first_id":
+          type: "string"
+        "has_more":
+          type: "boolean"
+        "last_id":
+          type: "string"
+    "Tool":
+      type: "object"
+      required:
+        - "function"
+        - "type"
+      properties:
+        "function": {"$ref": "#/components/schemas/Function"}
+        "type":
+          type: "string"
+    "ToolCall":
+      type: "object"
+      required:
+        - "id"
+        - "type"
+        - "function"
+      properties:
+        "function": {"$ref": "#/components/schemas/ToolCallFunction"}
+        "id":
+          type: "string"
+        "type":
+          type: "string"
+    "ToolCallFunction":
+      type: "object"
+      required:
+        - "name"
+        - "arguments"
+      properties:
+        "arguments":
+          type: "string"
+        "name":
+          type: "string"
+    "ToolCallOutput":
+      oneOf:
+        - type: "string"
+        - type: "array"
+          items: {}
+    "ToolChoice":
+      oneOf:
+        - type: "string"
+        - {}
+    "Usage":
+      type: "object"
+      required:
+        - "completion_tokens"
+        - "prompt_tokens"
+        - "total_tokens"
+      properties:
+        "completion_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+        "completion_tokens_details": {}
+        "prompt_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+        "prompt_tokens_details": {}
+        "total_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+    "ImageGenerationRequest":
+      type: "object"
+      required:
+        - "prompt"
+        - "model"
+      properties:
+        "prompt":
+          type: "string"
+          description: "A text description of the desired image(s). The maximum length is 1000 characters for dall-e-2 and 4000 characters for dall-e-3."
+        "model":
+          type: "string"
+          description: "The model to use for image generation."
+        "n":
+          type: "integer"
+          format: "int32"
+          minimum: 1
+          maximum: 10
+          nullable: true
+          description: "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported."
+        "response_format":
+          type: "string"
+          enum:
+            - "url"
+            - "b64_json"
+          nullable: true
+          description: "The format in which the generated images are returned. Must be one of url or b64_json. URLs are only valid for 60 minutes after the image has been generated."
+        "quality":
+          type: "string"
+          enum:
+            - "standard"
+            - "hd"
+          nullable: true
+          description: "The quality of the image that will be generated. hd creates images with finer details and greater consistency across the image. This param is only supported for dall-e-3."
+        "size":
+          type: "string"
+          enum:
+            - "256x256"
+            - "512x512"
+            - "1024x1024"
+            - "1792x1024"
+            - "1024x1792"
+          nullable: true
+          description: "The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024 for dall-e-2. Must be one of 1024x1024, 1792x1024, or 1024x1792 for dall-e-3 models."
+        "style":
+          type: "string"
+          enum:
+            - "vivid"
+            - "natural"
+          nullable: true
+          description: "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This param is only supported for dall-e-3."
+        "background":
+          type: "string"
+          nullable: true
+          description: "OpenAI only: Specify the background removal for the generated image."
+        "moderation":
+          type: "string"
+          nullable: true
+          description: "OpenAI only: Content moderation settings for the image generation."
+        "output_compression":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: "OpenAI only: Compression level for the output image, from 0 to 100."
+        "output_format":
+          type: "string"
+          nullable: true
+          description: "OpenAI only: The output format for the generated image."
+    "ImageGeneration":
+      type: "object"
+      required:
+        - "data"
+      properties:
+        "background":
+          type: "string"
+          nullable: true
+          description: "Background settings used in generation (OpenAI only)"
+        "created":
+          type: "integer"
+          format: "int64"
+          minimum: 0
+          nullable: true
+          description: "The Unix timestamp (in seconds) of when the image was created."
+        "output_format":
+          type: "string"
+          nullable: true
+          description: "The output format of the generated image (OpenAI only)"
+        "quality":
+          type: "string"
+          nullable: true
+          description: "The quality setting used for generation (OpenAI only)"
+        "size":
+          type: "string"
+          nullable: true
+          description: "The size of the generated image (OpenAI only)"
+        "usage": {"$ref": "#/components/schemas/ImageUsage", "nullable": true, "description": "Usage statistics for the image generation request (OpenAI only)"}
+        "data":
+          type: "array"
+          items: {"$ref": "#/components/schemas/ImageData"}
+          description: "The list of generated images."
+    "ImageData":
+      type: "object"
+      properties:
+        "b64_json":
+          type: "string"
+          nullable: true
+          description: "The base64-encoded JSON of the generated image, if response_format is b64_json."
+        "revised_prompt":
+          type: "string"
+          nullable: true
+          description: "The prompt that was used to generate the image, if there was any revision to the prompt."
+        "url":
+          type: "string"
+          nullable: true
+          description: "The URL of the generated image, if response_format is url (default)."
+    "ImageUsage":
+      type: "object"
+      required:
+        - "input_tokens"
+        - "input_tokens_details"
+        - "output_tokens"
+        - "total_tokens"
+      properties:
+        "input_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          description: "Number of tokens in the input prompt."
+        "input_tokens_details": {"$ref": "#/components/schemas/ImageInputTokens", "description": "Breakdown of input tokens by type."}
+        "output_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          description: "Number of tokens used for the generated image."
+        "total_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          description: "Total number of tokens used in the request (input + output)."
+    "IncompleteDetails":
+      type: "object"
+      required:
+        - "reason"
+      properties:
+        "reason":
+          type: "string"
+          description: "The reason the response is incomplete"
+    "InputItem":
+      oneOf:
+        - type: "object"
+          required:
+            - "content"
+            - "role"
+          properties:
+            "content": {"$ref": "#/components/schemas/MessageContent"}
+            "role":
+              type: "string"
+        - {"$ref": "#/components/schemas/Item"}
+        - type: "object"
+          required:
+            - "id"
+          properties:
+            "id":
+              type: "string"
+            "type":
+              type: "string"
+              nullable: true
+    "Item":
+      oneOf:
+        - type: "object"
+          required:
+            - "content"
+            - "role"
+            - "status"
+            - "type"
+          properties:
+            "content": {"$ref": "#/components/schemas/MessageContent"}
+            "role":
+              type: "string"
+            "status":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "content"
+            - "id"
+            - "role"
+            - "status"
+            - "type"
+          properties:
+            "content":
+              type: "array"
+              items: {"$ref": "#/components/schemas/OutputMessage"}
+            "id":
+              type: "string"
+            "role":
+              type: "string"
+            "status":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "id"
+            - "queries"
+            - "status"
+            - "results"
+            - "type"
+          properties:
+            "id":
+              type: "string"
+            "queries":
+              type: "array"
+              items: {}
+            "results":
+              type: "array"
+              items: {}
+            "status":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "action"
+            - "call_id"
+            - "id"
+            - "pending_safety_checks"
+            - "status"
+            - "type"
+          properties:
+            "action": {}
+            "call_id":
+              type: "string"
+            "id":
+              type: "string"
+            "pending_safety_checks":
+              type: "array"
+              items: {}
+            "status":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "call_id"
+            - "output"
+            - "type"
+          properties:
+            "acknowledged_safety_checks":
+              type: "array"
+              nullable: true
+              items: {}
+            "call_id":
+              type: "string"
+            "id":
+              type: "string"
+              nullable: true
+            "output": {}
+            "status":
+              type: "string"
+              nullable: true
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "action"
+            - "id"
+            - "status"
+            - "type"
+          properties:
+            "action": {}
+            "id":
+              type: "string"
+            "status":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "arguments"
+            - "call_id"
+            - "name"
+            - "type"
+          properties:
+            "arguments":
+              type: "string"
+            "call_id":
+              type: "string"
+            "id":
+              type: "string"
+              nullable: true
+            "name":
+              type: "string"
+            "status":
+              type: "string"
+              nullable: true
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "call_id"
+            - "output"
+            - "type"
+          properties:
+            "call_id":
+              type: "string"
+            "id":
+              type: "string"
+              nullable: true
+            "output": {"$ref": "#/components/schemas/ToolCallOutput"}
+            "status":
+              type: "string"
+              nullable: true
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "id"
+            - "summary"
+            - "type"
+            - "content"
+          properties:
+            "content":
+              type: "array"
+              items: {}
+            "encrypted_content":
+              type: "string"
+              nullable: true
+            "id":
+              type: "string"
+            "status":
+              type: "string"
+              nullable: true
+            "summary":
+              type: "array"
+              items: {}
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "id"
+            - "result"
+            - "status"
+            - "type"
+          properties:
+            "id":
+              type: "string"
+            "result":
+              type: "string"
+            "status":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "code"
+            - "container_id"
+            - "id"
+            - "outputs"
+            - "status"
+            - "type"
+          properties:
+            "code":
+              type: "string"
+            "container_id":
+              type: "string"
+            "id":
+              type: "string"
+            "outputs":
+              type: "array"
+              items: {}
+            "status":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "action"
+            - "call_id"
+            - "id"
+            - "status"
+            - "type"
+          properties:
+            "action": {}
+            "call_id":
+              type: "string"
+            "id":
+              type: "string"
+            "status":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "id"
+            - "output"
+            - "type"
+          properties:
+            "id":
+              type: "string"
+            "output":
+              type: "string"
+            "status":
+              type: "string"
+              nullable: true
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "id"
+            - "server_label"
+            - "tools"
+            - "type"
+          properties:
+            "error":
+              type: "string"
+              nullable: true
+            "id":
+              type: "string"
+            "server_label":
+              type: "string"
+            "tools":
+              type: "array"
+              items: {}
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "arguments"
+            - "id"
+            - "name"
+            - "server_label"
+            - "type"
+          properties:
+            "arguments":
+              type: "string"
+            "id":
+              type: "string"
+            "name":
+              type: "string"
+            "server_label":
+              type: "string"
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "approval_request_id"
+            - "approve"
+            - "type"
+          properties:
+            "approval_request_id":
+              type: "string"
+            "approve":
+              type: "boolean"
+            "id":
+              type: "string"
+              nullable: true
+            "reason":
+              type: "string"
+              nullable: true
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "arguments"
+            - "id"
+            - "name"
+            - "server_label"
+            - "type"
+          properties:
+            "approval_request_id":
+              type: "string"
+              nullable: true
+            "arguments":
+              type: "string"
+            "error":
+              type: "string"
+              nullable: true
+            "id":
+              type: "string"
+            "name":
+              type: "string"
+            "output":
+              type: "string"
+              nullable: true
+            "server_label":
+              type: "string"
+            "status":
+              type: "string"
+              nullable: true
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "call_id"
+            - "output"
+            - "type"
+          properties:
+            "call_id":
+              type: "string"
+            "id":
+              type: "string"
+              nullable: true
+            "output": {"$ref": "#/components/schemas/ToolCallOutput"}
+            "type":
+              type: "string"
+        - type: "object"
+          required:
+            - "call_id"
+            - "input"
+            - "name"
+            - "type"
+          properties:
+            "call_id":
+              type: "string"
+            "id":
+              type: "string"
+              nullable: true
+            "input":
+              type: "string"
+            "name":
+              type: "string"
+            "type":
+              type: "string"
+    "ImageInputTokens":
+      type: "object"
+      required:
+        - "image_tokens"
+        - "text_tokens"
+      properties:
+        "image_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          description: "Number of tokens used for image processing."
+        "text_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          description: "Number of tokens used for text processing."
+    "OutputMessage":
+      oneOf:
+        - type: "object"
+          required:
+            - "annotations"
+            - "text"
+            - "type"
+          properties:
+            "annotations":
+              type: "array"
+              items: {}
+            "logprobs":
+              type: "array"
+              nullable: true
+              items: {}
+            "text":
+              type: "string"
+            "type":
+              type: "string"
+              enum:
+                - "output_text"
+        - type: "object"
+          required:
+            - "refusal"
+            - "type"
+          properties:
+            "refusal":
+              type: "string"
+            "type":
+              type: "string"
+              enum:
+                - "refusal"
+    "Response":
+      type: "object"
+      required:
+        - "id"
+        - "object"
+        - "created_at"
+        - "model"
+        - "status"
+      properties:
+        "background":
+          type: "boolean"
+          nullable: true
+          description: "Whether the response was generated in the background"
+        "conversation":
+          allOf:
+            - {"$ref": "#/components/schemas/ResponseConversation"}
+          description: "The ID of the conversation this response belongs to"
+          nullable: true
+        "created_at":
+          type: "integer"
+          format: "int64"
+          description: "Unix timestamp (in seconds) when the response was created"
+        "error":
+          description: "Error information if the response failed"
+        "id":
+          type: "string"
+          description: "Unique identifier for the response"
+        "incomplete_details":
+          allOf:
+            - {"$ref": "#/components/schemas/IncompleteDetails"}
+          description: "Details about why the response is incomplete (if status is \"incomplete\")"
+          nullable: true
+        "instructions":
+          allOf:
+            - {"$ref": "#/components/schemas/ResponseInstructions"}
+          nullable: true
+          description: "Instructions provided to the model"
+        "max_output_tokens":
+          type: "integer"
+          format: "int32"
+          description: "Maximum number of output tokens"
+          minimum: 0
+          nullable: true
+        "max_tool_calls":
+          type: "integer"
+          format: "int32"
+          description: "Maximum number of tool calls"
+          minimum: 0
+          nullable: true
+        "metadata":
+          description: "Set of key-value pairs that can be attached to an object"
+        "model":
+          type: "string"
+          description: "The model used to generate the response"
+        "object":
+          type: "string"
+          description: "The object type, always \"response\""
+        "output":
+          type: "array"
+          items: {"$ref": "#/components/schemas/Item"}
+          description: "The output items generated by the model"
+          nullable: true
+        "parallel_tool_calls":
+          type: "boolean"
+          nullable: true
+          description: "Whether parallel tool calls are enabled"
+        "previous_response_id":
+          type: "string"
+          nullable: true
+          description: "ID of the previous response"
+        "prompt":
+          description: "Prompt configuration"
+        "prompt_cache_key":
+          type: "string"
+          nullable: true
+          description: "Prompt cache key"
+        "reasoning":
+          description: "Reasoning configuration"
+        "safety_identifier":
+          type: "string"
+          nullable: true
+          description: "Safety identifier"
+        "service_tier":
+          type: "string"
+          nullable: true
+          description: "Service tier used"
+        "status":
+          type: "string"
+          description: "The status of the response (e.g., \"in_progress\", \"completed\", \"failed\", \"cancelled\", \"incomplete\")"
+        "temperature":
+          type: "number"
+          format: "float"
+          nullable: true
+          description: "Temperature sampling parameter"
+        "text":
+          description: "Text configuration"
+        "tool_choice":
+          allOf:
+            - {"$ref": "#/components/schemas/ToolChoice"}
+          nullable: true
+          description: "Tool choice configuration"
+        "tools":
+          type: "array"
+          items: {}
+          nullable: true
+          description: "Tools available to the model"
+        "top_logprobs":
+          type: "integer"
+          format: "int32"
+          nullable: true
+          description: "Number of top log probabilities to return"
+          minimum: 0
+        "top_p":
+          type: "number"
+          format: "float"
+          nullable: true
+          description: "Top-p sampling parameter"
+        "truncation":
+          type: "string"
+          nullable: true
+          description: "Truncation strategy"
+        "usage":
+          allOf:
+            - {"$ref": "#/components/schemas/ResponseUsage"}
+          nullable: true
+          description: "Usage statistics for the API call"
+    "ResponseConversation":
+      type: "object"
+      required:
+        - "id"
+      properties:
+        "id":
+          type: "string"
+    "ResponseEvent":
+      type: "object"
+      required:
+        - "data"
+      properties:
+        "data":
+          type: "object"
+          description: "Server-sent event from the streaming Responses API. Contains dynamic fields based on event type (response.created, response.output_text.delta, etc.)"
+          required:
+            - "type"
+            - "sequence_number"
+          properties:
+            "type":
+              type: "string"
+              description: "The type of event (e.g., response.created, response.output_text.delta, response.done)"
+            "sequence_number":
+              type: "integer"
+              description: "Monotonically increasing sequence number for events in this response"
+          additionalProperties: true
+    "ResponseInstructions":
+      oneOf:
+        - type: "string"
+        - type: "array"
+          items: {}
+    "ResponseUsage":
+      type: "object"
+      required:
+        - "input_tokens"
+        - "output_tokens"
+        - "total_tokens"
+      properties:
+        "input_tokens":
+          type: "integer"
+          format: "int32"
+          description: "Number of tokens in the input"
+          minimum: 0
+        "input_tokens_details":
+          description: "Breakdown of input token details"
+        "output_tokens":
+          type: "integer"
+          format: "int32"
+          description: "Number of tokens in the output"
+          minimum: 0
+        "output_tokens_details":
+          description: "Breakdown of output token details"
+        "total_tokens":
+          type: "integer"
+          format: "int32"
+          description: "Total number of tokens used"
+          minimum: 0
+    "ResponsesConvo":
+      oneOf:
+        - type: "string"
+        - {}
+    "ResponsesInput":
+      oneOf:
+        - type: "string"
+        - type: "array"
+          items: {"$ref": "#/components/schemas/InputItem"}
+    "ResponsesRequest":
+      type: "object"
+      properties:
+        "background":
+          type: "boolean"
+          nullable: true
+        "conversation":
+          allOf:
+            - {"$ref": "#/components/schemas/ResponsesConvo"}
+          nullable: true
+        "include":
+          type: "array"
+          items: {}
+          nullable: true
+        "input":
+          allOf:
+            - {"$ref": "#/components/schemas/ResponsesInput"}
+          nullable: true
+        "instructions":
+          type: "string"
+          nullable: true
+        "max_output_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+        "max_tool_calls":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+        "metadata": {}
+        "model":
+          type: "string"
+          nullable: true
+        "parallel_tool_calls":
+          type: "boolean"
+          nullable: true
+        "previous_response_id":
+          type: "string"
+          nullable: true
+        "prompt": {}
+        "prompt_cache_key":
+          type: "string"
+          nullable: true
+        "reasoning": {}
+        "safety_identifier":
+          type: "string"
+          nullable: true
+        "service_tier":
+          type: "string"
+          nullable: true
+        "store":
+          type: "boolean"
+          nullable: true
+        "stream":
+          type: "boolean"
+          enum:
+            - false
+          default: false
+          description: "If set, partial message deltas and streaming events will be sent. For regular HTTP responses, this must be false."
+        "stream_options": {}
+        "temperature":
+          type: "number"
+          format: "float"
+          nullable: true
+        "text": {}
+        "tool_choice":
+          allOf:
+            - {"$ref": "#/components/schemas/ToolChoice"}
+          nullable: true
+        "tools":
+          type: "array"
+          items: {}
+          nullable: true
+        "top_logprobs":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+        "top_p":
+          type: "number"
+          format: "float"
+          nullable: true
+        "truncation":
+          type: "string"
+          nullable: true
+    "ResponsesRequestStream":
+      type: "object"
+      properties:
+        "background":
+          type: "boolean"
+          nullable: true
+        "conversation":
+          allOf:
+            - {"$ref": "#/components/schemas/ResponsesConvo"}
+          nullable: true
+        "include":
+          type: "array"
+          items: {}
+          nullable: true
+        "input":
+          allOf:
+            - {"$ref": "#/components/schemas/ResponsesInput"}
+          nullable: true
+        "instructions":
+          type: "string"
+          nullable: true
+        "max_output_tokens":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+        "max_tool_calls":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+        "metadata": {}
+        "model":
+          type: "string"
+          nullable: true
+        "parallel_tool_calls":
+          type: "boolean"
+          nullable: true
+        "previous_response_id":
+          type: "string"
+          nullable: true
+        "prompt": {}
+        "prompt_cache_key":
+          type: "string"
+          nullable: true
+        "reasoning": {}
+        "safety_identifier":
+          type: "string"
+          nullable: true
+        "service_tier":
+          type: "string"
+          nullable: true
+        "store":
+          type: "boolean"
+          nullable: true
+        "stream":
+          type: "boolean"
+          enum:
+            - true
+          default: true
+          description: "If set, partial message deltas and streaming events will be sent. For streaming responses, this must be set to true."
+        "stream_options": {}
+        "temperature":
+          type: "number"
+          format: "float"
+          nullable: true
+        "text": {}
+        "tool_choice":
+          allOf:
+            - {"$ref": "#/components/schemas/ToolChoice"}
+          nullable: true
+        "tools":
+          type: "array"
+          items: {}
+          nullable: true
+        "top_logprobs":
+          type: "integer"
+          format: "int32"
+          minimum: 0
+          nullable: true
+        "top_p":
+          type: "number"
+          format: "float"
+          nullable: true
+        "truncation":
+          type: "string"
+          nullable: true
+security:
+  - api_key: []
+tags:
+  - name: "Sudo API"
+    description: "Sudo: An AI Monetization Platform"

@@ -1,35 +1,36 @@
 lockVersion: 2.0.0
 id: f41d5249-2e28-4aee-bf6c-d4543ad21441
 management:
-  docChecksum: 3dfed336234b2667d6893ec7f7cd31ee
+  docChecksum: bb54183c28ee623ffbc9605f476eea57
   docVersion: 0.1.0
-  speakeasyVersion: 1.606.3
-  generationVersion: 2.687.1
-  releaseVersion: 0.0.1
-  configChecksum: eabf5f9e94dd7ab40bedeca47c99cc77
+  speakeasyVersion: 1.656.2
+  generationVersion: 2.753.6
+  releaseVersion: 0.2.0
+  configChecksum: 44ee6610154f8867ae2030c22dfff884
 features:
   python:
     additionalDependencies: 1.0.0
+    additionalProperties: 1.0.1
     constsAndDefaults: 1.0.5
-    core: 5.19.9
+    core: 5.23.6
     defaultEnabledRetries: 0.2.0
     devContainers: 3.0.0
     enumUnions: 0.1.0
     envVarSecurityUsage: 0.3.2
     flatRequests: 1.0.1
     flattening: 3.1.1
-    globalSecurity: 3.0.3
+    globalSecurity: 3.0.4
     globalSecurityCallbacks: 1.0.0
     globalSecurityFlattening: 1.0.0
-    globalServerURLs: 3.1.1
+    globalServerURLs: 3.2.0
     methodArguments: 1.0.2
     nullables: 1.0.1
     responseFormat: 1.0.1
     retries: 3.0.2
     sdkHooks: 1.1.0
-    serverEvents: 1.0.7
+    serverEvents: 1.0.11
     serverEventsSentinels: 0.1.0
-    unions: 3.0.4
+    unions: 3.1.0
 generatedFiles:
   - .devcontainer/README.md
   - .devcontainer/devcontainer.json
@@ -41,6 +42,8 @@ generatedFiles:
   - docs/models/chatcompletion.md
   - docs/models/chatcompletionchunk.md
   - docs/models/chatcompletionchunkchoice.md
+  - docs/models/chatcompletionchunkdata.md
+  - docs/models/chatcompletionchunkusage.md
   - docs/models/chatcompletiondelta.md
   - docs/models/chatcompletionlist.md
   - docs/models/chatcompletionrequestjson.md
@@ -98,7 +101,6 @@ generatedFiles:
   - docs/models/contentpart3.md
   - docs/models/contentpart4.md
   - docs/models/contentpartunion.md
-  - docs/models/data.md
   - docs/models/deletechatcompletionrequest.md
   - docs/models/errordetail.md
   - docs/models/file.md
@@ -112,14 +114,56 @@ generatedFiles:
   - docs/models/imageinputtokens.md
   - docs/models/imageurl.md
   - docs/models/imageusage.md
+  - docs/models/incompletedetails.md
   - docs/models/inputaudio.md
+  - docs/models/inputitem1.md
+  - docs/models/inputitem2.md
+  - docs/models/inputitemunion.md
+  - docs/models/instructions.md
+  - docs/models/item1.md
+  - docs/models/item10.md
+  - docs/models/item11.md
+  - docs/models/item12.md
+  - docs/models/item13.md
+  - docs/models/item14.md
+  - docs/models/item15.md
+  - docs/models/item16.md
+  - docs/models/item17.md
+  - docs/models/item18.md
+  - docs/models/item19.md
+  - docs/models/item2.md
+  - docs/models/item3.md
+  - docs/models/item4.md
+  - docs/models/item5.md
+  - docs/models/item6.md
+  - docs/models/item7.md
+  - docs/models/item8.md
+  - docs/models/item9.md
+  - docs/models/itemunion.md
   - docs/models/listchatcompletionsrequest.md
   - docs/models/logprobs.md
   - docs/models/messagecontent.md
   - docs/models/messageresponse.md
   - docs/models/object.md
+  - docs/models/outputmessage.md
+  - docs/models/outputmessageoutputtext.md
+  - docs/models/outputmessagerefusal.md
   - docs/models/quality.md
+  - docs/models/response.md
+  - docs/models/responseconversation.md
+  - docs/models/responseevent.md
+  - docs/models/responseeventdata.md
   - docs/models/responseformatenum.md
+  - docs/models/responsesrequest.md
+  - docs/models/responsesrequestconversation.md
+  - docs/models/responsesrequestinput.md
+  - docs/models/responsesrequeststream.md
+  - docs/models/responsesrequeststreamconversation.md
+  - docs/models/responsesrequeststreaminput.md
+  - docs/models/responsesrequeststreamtoolchoice.md
+  - docs/models/responsesrequesttoolchoice.md
+  - docs/models/responsetoolchoice.md
+  - docs/models/responseusage.md
   - docs/models/returnedchatmessages.md
   - docs/models/role.md
   - docs/models/security.md
@@ -130,12 +174,15 @@ generatedFiles:
   - docs/models/tool.md
   - docs/models/toolcall.md
   - docs/models/toolcallfunction.md
+  - docs/models/toolcalloutput.md
+  - docs/models/typeoutputtext.md
+  - docs/models/typerefusal.md
   - docs/models/updatechatcompletionrequest.md
   - docs/models/updatechatcompletionrequestbody.md
   - docs/models/usage.md
   - docs/models/utils/retryconfig.md
+  - docs/sdks/responses/README.md
   - docs/sdks/router/README.md
-  - docs/sdks/sudo/README.md
   - docs/sdks/system/README.md
   - py.typed
   - pylintrc
@@ -177,9 +224,16 @@ generatedFiles:
   - src/sudo_ai/models/imagegenerationrequest.py
   - src/sudo_ai/models/imageinputtokens.py
   - src/sudo_ai/models/imageusage.py
+  - src/sudo_ai/models/inputitem_union.py
+  - src/sudo_ai/models/item_union.py
   - src/sudo_ai/models/listchatcompletionsop.py
   - src/sudo_ai/models/messagecontent.py
   - src/sudo_ai/models/messageresponse.py
+  - src/sudo_ai/models/outputmessage.py
+  - src/sudo_ai/models/response.py
+  - src/sudo_ai/models/responseevent.py
+  - src/sudo_ai/models/responsesrequest.py
+  - src/sudo_ai/models/responsesrequeststream.py
   - src/sudo_ai/models/returnedchatmessages.py
   - src/sudo_ai/models/security.py
   - src/sudo_ai/models/supportedmodel.py
@@ -187,9 +241,11 @@ generatedFiles:
   - src/sudo_ai/models/tool.py
   - src/sudo_ai/models/toolcall.py
   - src/sudo_ai/models/toolcallfunction.py
+  - src/sudo_ai/models/toolcalloutput.py
   - src/sudo_ai/models/updatechatcompletionop.py
   - src/sudo_ai/models/usage.py
   - src/sudo_ai/py.typed
+  - src/sudo_ai/responses.py
   - src/sudo_ai/router.py
   - src/sudo_ai/sdk.py
   - src/sudo_ai/sdkconfiguration.py
@@ -314,6 +370,26 @@ examples:
       responses:
         "200":
           application/json: {"data": []}
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  createResponse:
+    speakeasy-default-create-response:
+      requestBody:
+        application/json: {"stream": false}
+      responses:
+        "200":
+          application/json: {"created_at": 905508, "id": "<id>", "model": "Mustang", "object": "<value>", "status": "<value>"}
+        "400":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+        "500":
+          application/json: {"error": {"message": "<value>", "type": "<value>"}}
+  createStreamingResponse:
+    speakeasy-default-create-streaming-response:
+      requestBody:
+        application/json: {"stream": true}
+      responses:
         "400":
           application/json: {"error": {"message": "<value>", "type": "<value>"}}
         "500":

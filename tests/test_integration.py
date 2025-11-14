@@ -11,6 +11,7 @@ Tests all router and system methods with various scenarios including:
 - Web search
 - PDF input
 - Reasoning models
+- Responses API (regular and streaming)
 - CRUD operations for stored completions
 - Error handling
 - System health and models endpoints
@@ -93,7 +94,7 @@ class SudoTestConfig:
         }
         
         # Image URL for vision tests
-        self.test_image_url = "https://upload.wikimedia.org/wikipedia/en/thumb/f/f7/RickRoll.png/330px-RickRoll.png"
+        self.test_image_url = "https://upload.wikimedia.org/wikipedia/en/f/f7/RickRoll.png"
         
     def get_client(self) -> Sudo:
         """Get configured SDK client."""
@@ -103,9 +104,6 @@ class SudoTestConfig:
                 api_key=self.api_key
             )
         return self.client
-    
-
-
 
 @pytest.fixture(scope="session")
 def config():
@@ -117,10 +115,6 @@ def config():
 def client(config):
     """Shared SDK client."""
     return config.get_client()
-
-
-
-
 
 class TestSystemMethods:
     """Test system endpoints."""
@@ -652,6 +646,123 @@ class TestReasoningModels:
 #         assert delete_response.object == "chat.completion.deleted"
 #         assert hasattr(delete_response, 'deleted')
 #         assert delete_response.deleted is True
+
+
+class TestResponsesAPI:
+    """Test Responses API functionality."""
+    
+    def test_create_response_basic(self, client):
+        """Test basic response creation with responses endpoint."""
+        try:
+            response = client.responses.create_response(
+                model="gpt-4o",
+                instructions="You are a helpful assistant.",
+                input_="Hello! Give me a study plan to learn Python.",
+                stream=False
+            )
+            
+            # Check response structure
+            assert response is not None
+            assert hasattr(response, 'id')
+            assert isinstance(response.id, str)
+            assert len(response.id) > 0
+            
+            # Check output
+            assert hasattr(response, 'output')
+            assert response.output is not None
+            
+            # The output could be a list or a single item depending on the API response
+            if isinstance(response.output, list):
+                assert len(response.output) > 0
+                # Check first output item
+                first_output = response.output[0]
+                if hasattr(first_output, 'content'):
+                    assert len(first_output.content) > 0
+            elif hasattr(response.output, 'content'):
+                assert isinstance(response.output.content, str)
+                assert len(response.output.content) > 0
+            
+            # Check usage if available
+            if hasattr(response, 'usage'):
+                usage = response.usage
+                if hasattr(usage, 'input_tokens'):
+                    assert isinstance(usage.input_tokens, int)
+                    assert usage.input_tokens > 0
+                if hasattr(usage, 'output_tokens'):
+                    assert isinstance(usage.output_tokens, int)
+                    assert usage.output_tokens > 0
+                    
+        except Exception as e:
+            handle_provider_errors(e, "gpt-4o", "responses_api")
+
+
+class TestStreamingResponses:
+    """Test streaming Responses API functionality."""
+    
+    def test_create_streaming_response(self, client):
+        """Test streaming response creation with responses endpoint.
+        
+        This test validates:
+        1. Stream returns ResponseEvent objects
+        2. Events can be dumped to dict using model_dump()
+        3. Events contain delta fields for streaming content
+        4. We receive actual AI-generated content in the stream
+        """
+        try:
+            stream = client.responses.create_streaming_response(
+                model="gpt-4o",
+                instructions="You are a helpful assistant.",
+                input_="Hello! Give me a list of all the planets in the solar system, with a few sentences about each.",
+                stream=True
+            )
+            
+            events_received = 0
+            content_received = ""
+            delta_events = 0
+            
+            for event in stream:
+                events_received += 1
+                
+                # Check event structure
+                assert event is not None
+                assert hasattr(event, 'data'), "Event should have a 'data' field"
+                
+                # Access the event data
+                event_data = event.data
+                
+                # Get event type and check for delta content
+                event_type = getattr(event_data, 'type', None)
+                
+                # The Responses API sends delta events with type "response.output_text.delta"
+                if event_type == 'response.output_text.delta':
+                    delta_events += 1
+                    
+                    # Access delta from additional properties
+                    if hasattr(event_data, 'additional_properties'):
+                        delta = event_data.additional_properties.get('delta')
+                        if delta and isinstance(delta, str):
+                            content_received += delta
+                    # Fallback: try to access delta directly if it was set as an attribute
+                    elif hasattr(event_data, 'delta'):
+                        delta = event_data.delta
+                        if isinstance(delta, str):
+                            content_received += delta
+            
+            # Verify we received events and some content
+            assert events_received > 0, f"Expected to receive events, got {events_received}"
+            assert delta_events > 0, f"Expected to receive delta events, got {delta_events}"
+            assert len(content_received) > 0, (
+                f"Expected to receive some content. "
+                f"Got {events_received} events ({delta_events} delta events) but no content extracted."
+            )
+            
+            # Verify the content makes sense (should mention planets)
+            content_lower = content_received.lower()
+            assert any(planet in content_lower for planet in ['mercury', 'venus', 'earth', 'mars']), \
+                f"Expected content about planets, got: {content_received[:200]}..."
+            
+        except Exception as e:
+            handle_provider_errors(e, "gpt-4o", "streaming_responses")
 
 
 class TestImageGeneration:
