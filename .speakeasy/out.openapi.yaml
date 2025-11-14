@@ -2199,7 +2199,24 @@ components:
         "id":
           type: "string"
     "ResponseEvent":
-      additionalProperties: true
+      type: "object"
+      required:
+        - "data"
+      properties:
+        "data":
+          type: "object"
+          description: "Server-sent event from the streaming Responses API. Contains dynamic fields based on event type (response.created, response.output_text.delta, etc.)"
+          required:
+            - "type"
+            - "sequence_number"
+          properties:
+            "type":
+              type: "string"
+              description: "The type of event (e.g., response.created, response.output_text.delta, response.done)"
+            "sequence_number":
+              type: "integer"
+              description: "Monotonically increasing sequence number for events in this response"
+          additionalProperties: true
     "ResponseInstructions":
       oneOf:
         - type: "string"

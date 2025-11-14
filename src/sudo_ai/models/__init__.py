@@ -9,11 +9,11 @@ if TYPE_CHECKING:
     from .chatcompletion import ChatCompletion, ChatCompletionTypedDict
     from .chatcompletionchunk import (
         ChatCompletionChunk,
+        ChatCompletionChunkData,
+        ChatCompletionChunkDataTypedDict,
         ChatCompletionChunkTypedDict,
         ChatCompletionChunkUsage,
         ChatCompletionChunkUsageTypedDict,
-        Data,
-        DataTypedDict,
         Object,
     )
     from .chatcompletionchunkchoice import (
@@ -234,7 +234,12 @@ if TYPE_CHECKING:
         ResponseUsage,
         ResponseUsageTypedDict,
     )
-    from .responseevent import ResponseEvent, ResponseEventTypedDict
+    from .responseevent import (
+        ResponseEvent,
+        ResponseEventData,
+        ResponseEventDataTypedDict,
+        ResponseEventTypedDict,
+    )
     from .responsesrequest import (
         ResponsesRequest,
         ResponsesRequestConversation,
@@ -279,6 +284,8 @@ __all__ = [
     "ChatCompletionChunk",
     "ChatCompletionChunkChoice",
     "ChatCompletionChunkChoiceTypedDict",
+    "ChatCompletionChunkData",
+    "ChatCompletionChunkDataTypedDict",
     "ChatCompletionChunkTypedDict",
     "ChatCompletionChunkUsage",
     "ChatCompletionChunkUsageTypedDict",
@@ -375,8 +382,6 @@ __all__ = [
     "ContentPart4TypedDict",
     "ContentPartUnion",
     "ContentPartUnionTypedDict",
-    "Data",
-    "DataTypedDict",
     "DeleteChatCompletionRequest",
     "DeleteChatCompletionRequestTypedDict",
     "ErrorDetail",
@@ -474,6 +479,8 @@ __all__ = [
     "ResponseConversation",
     "ResponseConversationTypedDict",
     "ResponseEvent",
+    "ResponseEventData",
+    "ResponseEventDataTypedDict",
     "ResponseEventTypedDict",
     "ResponseFormatEnum",
     "ResponseToolChoice",
@@ -530,11 +537,11 @@ _dynamic_imports: dict[str, str] = {
     "ChatCompletion": ".chatcompletion",
     "ChatCompletionTypedDict": ".chatcompletion",
     "ChatCompletionChunk": ".chatcompletionchunk",
+    "ChatCompletionChunkData": ".chatcompletionchunk",
+    "ChatCompletionChunkDataTypedDict": ".chatcompletionchunk",
     "ChatCompletionChunkTypedDict": ".chatcompletionchunk",
     "ChatCompletionChunkUsage": ".chatcompletionchunk",
     "ChatCompletionChunkUsageTypedDict": ".chatcompletionchunk",
-    "Data": ".chatcompletionchunk",
-    "DataTypedDict": ".chatcompletionchunk",
     "Object": ".chatcompletionchunk",
     "ChatCompletionChunkChoice": ".chatcompletionchunkchoice",
     "ChatCompletionChunkChoiceTypedDict": ".chatcompletionchunkchoice",
@@ -737,6 +744,8 @@ _dynamic_imports: dict[str, str] = {
     "ResponseUsage": ".response",
     "ResponseUsageTypedDict": ".response",
     "ResponseEvent": ".responseevent",
+    "ResponseEventData": ".responseevent",
+    "ResponseEventDataTypedDict": ".responseevent",
     "ResponseEventTypedDict": ".responseevent",
     "ResponsesRequest": ".responsesrequest",
     "ResponsesRequestConversation": ".responsesrequest",

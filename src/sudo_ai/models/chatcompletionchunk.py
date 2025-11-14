@@ -42,7 +42,7 @@ class ChatCompletionChunkUsage(BaseModel):
     prompt_tokens_details: Optional[Any] = None
 
 
-class DataTypedDict(TypedDict):
+class ChatCompletionChunkDataTypedDict(TypedDict):
     id: str
     r"""A unique identifier for the chat completion."""
     object: Object
@@ -59,7 +59,7 @@ class DataTypedDict(TypedDict):
     r"""Usage statistics for the completion request. When stream_options.include_usage is set, the final chunk before [DONE] will contain the full usage statistics, and all other chunks will include usage with a null value."""
 
 
-class Data(BaseModel):
+class ChatCompletionChunkData(BaseModel):
     id: str
     r"""A unique identifier for the chat completion."""
 
@@ -113,8 +113,8 @@ class Data(BaseModel):
 
 
 class ChatCompletionChunkTypedDict(TypedDict):
-    data: NotRequired[DataTypedDict]
+    data: NotRequired[ChatCompletionChunkDataTypedDict]
 
 
 class ChatCompletionChunk(BaseModel):
-    data: Optional[Data] = None
+    data: Optional[ChatCompletionChunkData] = None

@@ -1,4 +1,4 @@
-# Data
+# ChatCompletionChunkData
 
 
 ## Fields
