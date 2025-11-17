@@ -94,7 +94,7 @@ class SudoTestConfig:
         }
         
         # Image URL for vision tests
-        self.test_image_url = "https://upload.wikimedia.org/wikipedia/en/f/f7/RickRoll.png"
+        self.test_image_url = "https://picsum.photos/id/237/200/300"
         
     def get_client(self) -> Sudo:
         """Get configured SDK client."""
